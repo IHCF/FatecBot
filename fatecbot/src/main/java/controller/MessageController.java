@@ -1,6 +1,5 @@
 package controller;
 
-import com.ibm.watson.developer_cloud.conversation.v1.Conversation;
 import com.pengrad.telegrambot.model.Update;
 
 import model.Model;
@@ -16,8 +15,8 @@ public class MessageController {
 		this.view = view;
 	}
 
-	public void process(Update update, Conversation service, String workspaceId) {
+	public void process(Update update) {
 		view.sendTypingMessage(update);
-		model.processMessage(update, service, workspaceId);
+		model.processMessage(update);
 	}
 }

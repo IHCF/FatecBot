@@ -1,4 +1,4 @@
-package pizza_bot.pizza_bot;
+package fatec_bot.fatec_bot;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,10 +12,9 @@ import view.View;
 
 public class App {
 	public static void main(String[] args) {
-
 		JSONObject keys = null;
 		Model model = Model.getInstance();
-		
+
 		try {
 			keys = ToolBox.loadKeys();
 		} catch (FileNotFoundException e) {
@@ -26,16 +25,12 @@ public class App {
 			e.printStackTrace();
 		}
 
-		View view = new View(
-				keys.get("bot_token").toString(), 
-				keys.get("ibmUser").toString(),
-				keys.get("ibmPassword").toString(), 
-				keys.get("workspace").toString(), model);
-		
+		View view = new View(keys.get("bot_token").toString(), model);
+
 		System.out.println("Bot pronto!");
-		
+
 		model.registerObserver(view);
-		
+
 		view.receiveUsersMessages();
 	}
 }
