@@ -2,11 +2,11 @@ package view;
 
 import java.util.List;
 
-import com.ibm.watson.developer_cloud.conversation.v1.Conversation;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ChatAction;
+import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.request.GetUpdates;
 import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -18,26 +18,20 @@ import model.Observer;
 
 public class View implements Observer {
 
-	private Conversation service;
-
+	@SuppressWarnings("unused")
 	private Model model;
 
 	private TelegramBot bot;
-	private String workspaceId;
 	private Integer offSet = 0;
 	private MessageController controller;
 	private GetUpdatesResponse updatesResponse;
 
-	public View(String botToken, String ibmUser, String ibmPassword, String workspaceId, Model model) {
+	public View(String botToken, Model model) {
 
 		this.model = model;
 
 		bot = new TelegramBot(botToken);
 		controller = new MessageController(model, this);
-		service = new Conversation(Conversation.VERSION_DATE_2017_05_26);
-
-		this.workspaceId = workspaceId;
-		service.setUsernameAndPassword(ibmUser, ibmPassword);
 	}
 
 	public void receiveUsersMessages() {
@@ -55,18 +49,22 @@ public class View implements Observer {
 
 	public void processConversation() {
 		updatesResponse = bot.execute(new GetUpdates().limit(100).offset(offSet));
-
 		List<Update> updates = updatesResponse.updates();
 
 		for (Update update : updates) {
-			controller.process(update, service, workspaceId);
+			controller.process(update);
 			offSet = update.updateId() + 1;
 		}
-
 	}
 
-	public void update(long chatId, String message) {
-		bot.execute(new SendMessage(chatId, message));
+	public void update(long chatId, String message, Keyboard keyBoard) {
+
+		if (keyBoard == null) {
+			bot.execute(new SendMessage(chatId, message));
+		} else {
+			bot.execute(new SendMessage(chatId, message).replyMarkup(keyBoard));
+		}
+
 	}
 
 	public void sendTypingMessage(Update update) {
