@@ -11,7 +11,8 @@ import model.ToolBox;
 import view.View;
 
 public class App {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException, ParseException {
+
 		JSONObject keys = null;
 		Model model = Model.getInstance();
 
@@ -21,16 +22,15 @@ public class App {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (ParseException e) {
+		} catch (org.json.simple.parser.ParseException e) {
 			e.printStackTrace();
 		}
 
-		View view = new View(keys.get("bot_token").toString(), model);
+		View view = new View(keys.get("TELEGRAM_TOKEN").toString(), model);
 
-		System.out.println("Bot pronto!");
+		System.out.println("Bot inicializado");
 
 		model.registerObserver(view);
-
 		view.receiveUsersMessages();
 	}
 }

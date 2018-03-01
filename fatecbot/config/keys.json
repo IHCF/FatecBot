@@ -1,3 +1,5 @@
 {
-  "bot_token": ""
+  "TELEGRAM_TOKEN": "",
+  "MLAB_USER": "",
+  "MLAB_PASSWORD": ""
 }

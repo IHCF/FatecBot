@@ -11,11 +11,13 @@ import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 
 public class Model implements Subject {
 
-	private List<Observer> observers = new LinkedList<Observer>();
 	private Map<Long, Student> studentsNoRegistry = new HashMap<Long, Student>();
+	private List<Observer> observers = new LinkedList<Observer>();
+
 	private boolean inRegister;
 	private boolean inRegisterName;
 	private boolean inRegisterPassword;
+	private MongoLab mLab;
 
 	private static Model uniqueInstance;
 
@@ -27,8 +29,6 @@ public class Model implements Subject {
 	}
 
 	public void processMessage(Update update) {
-		// ToDO Inserir usuários no banco
-		// ToDo Fazer verificação da mensagem de boas-vindas
 
 		Long chatId = update.message().chat().id();
 		Keyboard keyBoard = null;
@@ -42,28 +42,43 @@ public class Model implements Subject {
 		}
 
 		else if (update.message().text().equals("/registro") && inRegister) {
-			message = "Insira seu nome de usuário do SIGA";
 			inRegisterName = true;
 			inRegisterPassword = true;
+
+			message = "Insira seu nome de usuário do SIGA";
 		}
 
 		else if (inRegisterName) {
 			studentsNoRegistry.get(chatId).setUserSiga(update.message().text());
 			inRegisterName = false;
-			
+
 			message = "Insira sua senha do SIGA";
 		}
 
 		else if (inRegisterPassword) {
-			studentsNoRegistry.get(chatId).setUserSiga(update.message().text());
-			inRegisterPassword = false;
-			inRegister = false;
-			
+			studentsNoRegistry.get(chatId).setPassSiga(update.message().text());
+			Student student = studentsNoRegistry.get(chatId);
+
+			try {
+				mLab = new MongoLab();
+				mLab.addUser(student);
+
+				inRegisterPassword = false;
+				inRegister = false;
+
+				message = "Cadastro feito com sucesso";
+				
+			} catch (Exception e) {
+				inRegisterPassword = true;
+				inRegister = true;
+				notifyObserver(chatId, "Erro ao realizar o cadastro, tente novamente utilizando /registro", null);
+			}
+
 			// ToDo Verificar autenticidade das informações
-			message = "Cadastro efeituado com sucesso!";
+			// Para isso será utilizado a API do Filipe
 		}
 
-		else if (!inRegister) {
+		if (!inRegister) {
 			message = "Escolha uma das opções";
 			keyBoard = new ReplyKeyboardMarkup(new String[] { "Horario", "Calendario" },
 					new String[] { "Faltas", "Baixar histórico escolar" }, new String[] { "Ajuda", "Sobre" });

@@ -4,15 +4,9 @@ public class Student {
 	private Long chatId;
 	private String userSiga;
 	private String passSiga;
-	private String hashSiga;
 
 	public Student(Long chatId) {
 		this.chatId = chatId;
-	}
-
-	public Student(Long chatId, String hashSiga) {
-		this.chatId = chatId;
-		this.hashSiga = hashSiga;
 	}
 
 	public String getUserSiga() {
@@ -29,6 +23,14 @@ public class Student {
 
 	public void setPassSiga(String passSiga) {
 		this.passSiga = passSiga;
+	}
+
+	public Long getChatId() {
+		return chatId;
+	}
+
+	public void setChatId(Long chatId) {
+		this.chatId = chatId;
 	}
 
 }
