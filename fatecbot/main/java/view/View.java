@@ -64,7 +64,6 @@ public class View implements Observer {
 		} else {
 			bot.execute(new SendMessage(chatId, message).replyMarkup(keyBoard));
 		}
-
 	}
 
 	public void sendTypingMessage(Update update) {
