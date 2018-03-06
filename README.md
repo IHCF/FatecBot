@@ -2,7 +2,7 @@
 
 CUI para Telegram que facilita o acesso aos dados do SIGA
 
-[!logo-text](/logo/logo-text.PNG)
+![logo-text](/logo/logo-text.PNG)
 
 
 ### Testes
