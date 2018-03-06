@@ -6,7 +6,9 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ChatAction;
+import com.pengrad.telegrambot.model.request.ForceReply;
 import com.pengrad.telegrambot.model.request.Keyboard;
+import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.GetUpdates;
 import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -57,10 +59,12 @@ public class View implements Observer {
 		}
 	}
 
-	public void update(long chatId, String message, Keyboard keyBoard) {
+	public void update(long chatId, String message, Keyboard keyBoard, boolean replyMessage) {
 
-		if (keyBoard == null) {
-			bot.execute(new SendMessage(chatId, message));
+		if (replyMessage) {
+			bot.execute(new SendMessage(chatId, message).replyMarkup(new ForceReply()).parseMode(ParseMode.Markdown));
+		} else if (keyBoard == null) {
+			bot.execute(new SendMessage(chatId, message).parseMode(ParseMode.Markdown));
 		} else {
 			bot.execute(new SendMessage(chatId, message).replyMarkup(keyBoard));
 		}
