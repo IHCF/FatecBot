@@ -33,10 +33,10 @@ public class MongoLab {
 		return db.getCollection("users");
 	}
 
-	public void addUser(Student student) throws MongoException {
+	public void addUser(long chatId, String username, String password) throws MongoException {
 
-		Document document = new Document("CHATID", student.getChatId()).append("SIGA_USER", student.getUserSiga())
-				.append("SIGA_PASS", student.getPassSiga());
+		Document document = new Document("CHATID", chatId).append("SIGA_USER", username)
+				.append("SIGA_PASS",password);
 
 		// A cada nova requisição será feita a conexão com o banco de dados. Isso evita
 		// problemas com segurança
