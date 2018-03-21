@@ -1,6 +1,7 @@
 package model;
 
 public class Student {
+	
 	private Long chatId;
 	private String userSiga;
 	private String passSiga;
