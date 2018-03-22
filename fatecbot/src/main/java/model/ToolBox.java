@@ -3,14 +3,17 @@ package model;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class ToolBox {
-	public static JSONObject loadKeys() throws FileNotFoundException, IOException, ParseException {
-		JSONParser parser = new JSONParser();
-		return (JSONObject) parser.parse(new FileReader("config/keys.json"));
+	public static JsonObject loadKeys() throws FileNotFoundException, IOException, ParseException {
+
+		JsonElement parser = new JsonParser().parse(new FileReader("config/keys.json"));
+
+		return parser.getAsJsonObject();
 	}
 }

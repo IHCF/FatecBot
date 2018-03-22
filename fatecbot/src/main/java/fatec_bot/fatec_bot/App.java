@@ -2,9 +2,9 @@ package fatec_bot.fatec_bot;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
+import com.google.gson.JsonObject;
 
 import model.Model;
 import model.ToolBox;
@@ -13,7 +13,7 @@ import view.View;
 public class App {
 	public static void main(String[] args) throws IOException, ParseException {
 
-		JSONObject keys = null;
+		JsonObject keys = null;
 		Model model = Model.getInstance();
 
 		try {
@@ -22,11 +22,9 @@ public class App {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (org.json.simple.parser.ParseException e) {
-			e.printStackTrace();
 		}
 
-		View view = new View(keys.get("TELEGRAM_TOKEN").toString(), model);
+		View view = new View(keys.get("TELEGRAM_TOKEN").toString().replaceAll("\"", ""), model);
 
 		System.out.println("Bot inicializado");
 

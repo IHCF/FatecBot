@@ -1,19 +1,24 @@
 package model;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import org.bson.Document;
-
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.pengrad.telegrambot.model.request.Keyboard;
 
 public class Model implements Subject {
 
+	private ConnectAPI api = new ConnectAPI();
 	private List<Observer> observers = new LinkedList<Observer>();
 
-	private MongoLab mLab;
-
 	private static Model uniqueInstance;
+
+	// Adicionado map para simular base de dados
+	Map<Long, String[]> usersConnected = new HashMap<Long, String[]>();
 
 	public static Model getInstance() {
 		if (uniqueInstance == null) {
@@ -23,27 +28,41 @@ public class Model implements Subject {
 	}
 
 	public void addUser(Long chatId, String name, String password) {
-		// Antes de adicionar verificar conectividade
-		try {
-			mLab = new MongoLab();
-			mLab.addUser(chatId, name, password);
-		} catch (Exception e) {
-			notifyObserver(chatId, "Falha ao tentar acessar a base de dados", null, false);
-		}
+		// ToDo: Adicionar forma de acesso ao SQLite
+		usersConnected.put(chatId, new String[] { name, password });
+		notifyObserver(chatId, "Usuário cadastrado com sucesso", null, false);
 	}
 
-	public void recoveryUser(Long chatId) {
-		try {
-			mLab = new MongoLab();
-			Document studentTemp = mLab.getUser(chatId);
+	public String[] recoveryUser(Long chatId) {
+		// ToDo: Adicionar forma de acesso ao MySQL
+		return usersConnected.get(chatId);
+	}
 
-			if (!studentTemp.get("SIGA_USER").equals("")) {
-				// Temporário até que a API fique pronta =D
-				notifyObserver(chatId, "Seja bem-vindo novamente " + studentTemp.getString("SIGA_USER"), null, false);
+	public void getAbsenses(Long chatId) {
+		String[] userInfo = recoveryUser(chatId);
+
+		if (userInfo.length != 0) {
+			StringBuilder absensesBuilder = new StringBuilder();
+			absensesBuilder.append("Suas faltas: \n");
+			try {
+				JsonArray absenses = api.sendPost(userInfo[0], userInfo[1]);
+
+				for (JsonElement element : absenses) {
+					absensesBuilder.append("Matéria: " + element.getAsJsonObject().get("name") + "\n");
+					absensesBuilder.append("Professor(a): " + element.getAsJsonObject().get("teacherName") + "\n");
+					absensesBuilder.append("Quantidade de faltas: " + element.getAsJsonObject().get("absenses") + "\n");
+					absensesBuilder.append("- - - - - - - - - - - -\n");
+				}
+
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 
-		} catch (Exception e) {
-			notifyObserver(chatId, "Falha ao tentar acessar a base de dados", null, false);
+			notifyObserver(chatId, absensesBuilder.toString(), null, false);
+
+		} else {
+			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registrar para fazer o cadastro",
+					null, false);
 		}
 	}
 

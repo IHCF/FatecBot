@@ -13,6 +13,7 @@ import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetUpdatesResponse;
 
+import controller.AbsenceController;
 import controller.AuthController;
 import controller.ProcessController;
 import model.Model;
@@ -28,7 +29,7 @@ public class View implements Observer {
 	public static final Integer IS_REGISTERING_PASSWORD = 3;
 	public static final Integer IS_SEARCHING = 4;
 	public static final Integer IS_RECOVERY_USER = 5;
-	
+
 	private TelegramBot bot;
 	private Integer state = IS_NOTHING;
 	private Integer offSet = 0;
@@ -59,7 +60,6 @@ public class View implements Observer {
 	public void processConversation() {
 		updatesResponse = bot.execute(new GetUpdates().limit(100).offset(offSet));
 		List<Update> updates = updatesResponse.updates();
-
 		for (Update update : updates) {
 
 			if (state == IS_NOTHING) {
@@ -76,10 +76,14 @@ public class View implements Observer {
 				else if (update.message().text().equals("/registro")) {
 					state = IS_REGISTERING;
 					update(update.message().chat().id(), "Insira seu nome de usuário do SIGA", null, true);
-				} 
-				
+				}
+
 				else if (update.message().text().equals("/recuperar")) {
 					state = IS_RECOVERY_USER;
+				}
+
+				else if (update.message().text().equals("/faltas")) {
+					setController(new AbsenceController(model, this));
 				}
 
 			} else if (state == IS_REGISTERING) {
