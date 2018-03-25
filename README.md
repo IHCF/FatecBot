@@ -1,17 +1,18 @@
-# FatecBot
+# FatecBot - Telegram
+
+[![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
 CUI para Telegram que facilita o acesso aos dados do SIGA
 
-![logo-text](/logo/logo-text.PNG)
+## Sobre :speech_balloon:
 
-### Testes
+Acessar o SIGA nem sempre é uma tarefa fácil, dentro de um ônibus, ou andando, por exemplo, pode-se ter problemas, mas uma conversa rápida ? É bem mais fácil, por isso criamos o FatecBot, que facilita o processo de aquisições de dados do SIGA, e devolve tudo em uma interface simples.
 
-Há testes unitários que fazem as verificações de conectividade com o mLab. Para testar preencha o arquivo <code>keys.json</code>.
+Há outros projetos que tem a mesma finalidade, que também foram criados por nós.
 
-###  Dados
+- [Fatec API](https://github.com/filipemeneses/fatec-api) :rage1:
+- [Fatec Bot para Discord](https://github.com/M3nin0/fatec-bot) :rage2:
+- [Fatec Posso Faltar](https://github.com/filipemeneses/fatec-posso-faltar) :rage3:
+- [Fatec Posso Faltar Bot](https://github.com/IHCF/posso-faltar-bot) :rage4:
 
-Para armazenar as informações dos usuários está sendo utilizado o mLab.
-
-Veja o formato dos dados registrados:
-
-![logo-text](/logo/jsonfy.PNG)
+Todos esses projetos auxiliam os alunos a ter acesso aos dados do SIGA. Este projeto foi feito como parte da matéria de Engenharia de software 3 :sunglasses:
