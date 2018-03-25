@@ -22,7 +22,16 @@ public class AuthController implements ProcessController {
 		view.sendTypingMessage(update);
 
 		if (view.getState() == View.IS_RECOVERY_USER) {
-			model.recoveryUser(update.message().chat().id());
+			String[] userInfo = model.recoveryUser(update.message().chat().id(), true);
+
+			// Verificando se o usuário está registrado
+			if (userInfo != null) {
+				name = userInfo[0];
+				password = userInfo[1];
+			}
+			// Retorna o estado original do bot.
+			view.setState(View.IS_NOTHING);
+
 		} else if (view.getState() == View.IS_REGISTERING_USERNAME) {
 			name = update.message().text();
 		} else if (view.getState() == View.IS_REGISTERING_PASSWORD) {
