@@ -24,6 +24,7 @@ public class App {
 			e.printStackTrace();
 		}
 
+		// Remove caracteres inválidos do Token e insere no View
 		View view = new View(keys.get("TELEGRAM_TOKEN").toString().replaceAll("\"", ""), model);
 
 		System.out.println("Bot inicializado");

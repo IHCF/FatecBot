@@ -8,7 +8,6 @@ import java.util.Map;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.pengrad.telegrambot.model.request.Keyboard;
 
 public class Model implements Subject {
 
@@ -17,7 +16,7 @@ public class Model implements Subject {
 
 	private static Model uniqueInstance;
 
-	// Adicionado map para simular base de dados
+	// Adicionado map para simular base de dados (Temporário)
 	Map<Long, String[]> usersConnected = new HashMap<Long, String[]>();
 
 	public static Model getInstance() {
@@ -30,21 +29,41 @@ public class Model implements Subject {
 	public void addUser(Long chatId, String name, String password) {
 		// ToDo: Adicionar forma de acesso ao SQLite
 		usersConnected.put(chatId, new String[] { name, password });
-		notifyObserver(chatId, "Usuário cadastrado com sucesso", null, false);
+		notifyObserver(chatId, "Usuário cadastrado com sucesso. Utilize os botões para se comunicar comigo", true,
+				false);
 	}
 
-	public String[] recoveryUser(Long chatId) {
-		// ToDo: Adicionar forma de acesso ao MySQL
-		return usersConnected.get(chatId);
+	public String[] recoveryUser(Long chatId, boolean login) {
+
+		String[] userInfo = usersConnected.get(chatId);
+
+		// Caso seja login e algum usuário tenha sido encontrado
+		if (userInfo != null && login) {
+			notifyObserver(chatId, "Usuário encontrado! Agora basta utilizar os comandos, que coleto os dados do SIGA",
+					true, false);
+
+			return userInfo;
+			// Caso seja login e nenhum usuário tenha sido encontrado
+		} else if (login) {
+			notifyObserver(chatId, "Não encontrei nenhum registro seu. Utilize o /registro para fazer o cadastro",
+					false, false);
+			return null;
+			// Caso a busca de usuário não seja no login, e algum usuário foi encontrado
+		} else if (userInfo != null && !login == true) {
+			return userInfo;
+		}
+
+		return null;
 	}
 
 	public void getAbsenses(Long chatId) {
-		String[] userInfo = recoveryUser(chatId);
+		String[] userInfo = recoveryUser(chatId, false);
 
-		if (userInfo.length != 0) {
+		if (userInfo != null) {
 			StringBuilder absensesBuilder = new StringBuilder();
 			absensesBuilder.append("Suas faltas: \n");
 			try {
+				// Recupera as informações da API
 				JsonArray absenses = api.sendPost(userInfo[0], userInfo[1]);
 
 				for (JsonElement element : absenses) {
@@ -55,14 +74,17 @@ public class Model implements Subject {
 				}
 
 			} catch (IOException e) {
-				e.printStackTrace();
+				// Caso a API não consiga entregar informações do usuário
+				notifyObserver(chatId,
+						"Acho que não consegui recuperar suas informações =(. Se precisar utilize /registrar novamente!",
+						false, false);
 			}
 
-			notifyObserver(chatId, absensesBuilder.toString(), null, false);
+			notifyObserver(chatId, absensesBuilder.toString(), true, false);
 
 		} else {
 			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registrar para fazer o cadastro",
-					null, false);
+					false, false);
 		}
 	}
 
@@ -70,7 +92,7 @@ public class Model implements Subject {
 		observers.add(observer);
 	}
 
-	public void notifyObserver(long chatId, String message, Keyboard keyBoard, boolean replyMessage) {
+	public void notifyObserver(long chatId, String message, boolean keyBoard, boolean replyMessage) {
 		for (Observer observer : observers) {
 			observer.update(chatId, message, keyBoard, replyMessage);
 		}

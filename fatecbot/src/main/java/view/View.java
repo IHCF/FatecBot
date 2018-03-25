@@ -7,7 +7,8 @@ import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ChatAction;
 import com.pengrad.telegrambot.model.request.ForceReply;
-import com.pengrad.telegrambot.model.request.Keyboard;
+import com.pengrad.telegrambot.model.request.KeyboardButton;
+import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.GetUpdates;
 import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -44,6 +45,9 @@ public class View implements Observer {
 		bot = new TelegramBot(botToken);
 	}
 
+	/**
+	 * Método para ativar a escuta de mensagens do bot.
+	 */
 	public void receiveUsersMessages() {
 		bot.setUpdatesListener(new UpdatesListener() {
 			public int process(List<Update> arg0) {
@@ -57,6 +61,9 @@ public class View implements Observer {
 		});
 	}
 
+	/**
+	 * Método utilizado para processar cada uma das informações recebidas do Chat
+	 */
 	public void processConversation() {
 		updatesResponse = bot.execute(new GetUpdates().limit(100).offset(offSet));
 		List<Update> updates = updatesResponse.updates();
@@ -69,26 +76,26 @@ public class View implements Observer {
 							"Olá, seja bem-vindo ao FatecBot, assistente simples e fácil de utilizar,"
 									+ " vou te ajudar com o SIGA. Para que eu tenha acesso as suas informações"
 									+ " faça o registro utilizando o comando: \n/registro, caso já seja registrado use:  /recuperar",
-							null, false);
+							false, false);
 					setController(new AuthController(model, this));
 				}
 
 				else if (update.message().text().equals("/registro")) {
 					state = IS_REGISTERING;
-					update(update.message().chat().id(), "Insira seu nome de usuário do SIGA", null, true);
+					update(update.message().chat().id(), "Insira seu nome de usuário do SIGA", false, true);
 				}
 
 				else if (update.message().text().equals("/recuperar")) {
 					state = IS_RECOVERY_USER;
 				}
 
-				else if (update.message().text().equals("/faltas")) {
+				else if (update.message().text().equals("Ver faltas")) {
 					setController(new AbsenceController(model, this));
 				}
 
 			} else if (state == IS_REGISTERING) {
 				state = IS_REGISTERING_USERNAME;
-				update(update.message().chat().id(), "Insira sua senha do SIGA", null, true);
+				update(update.message().chat().id(), "Insira sua senha do SIGA", false, true);
 			} else if (state == IS_REGISTERING_USERNAME) {
 				state = IS_REGISTERING_PASSWORD;
 			}
@@ -98,15 +105,23 @@ public class View implements Observer {
 		}
 	}
 
-	public void update(long chatId, String message, Keyboard keyBoard, boolean replyMessage) {
+	/**
+	 * Método que recebe informações que devem ser pasadas ao usuário.
+	 */
+	public void update(long chatId, String message, boolean keyBoard, boolean replyMessage) {
 
 		if (replyMessage) {
 			bot.execute(new SendMessage(chatId, message).replyMarkup(new ForceReply()));
+		} else if (keyBoard) {
+			bot.execute(new SendMessage(chatId, message)
+					.replyMarkup(new ReplyKeyboardMarkup(new KeyboardButton[] { new KeyboardButton("Ver faltas") })));
 		} else {
 			bot.execute(new SendMessage(chatId, message));
 		}
+
 	}
 
+	
 	public void sendTypingMessage(Update update) {
 		bot.execute(new SendChatAction(update.message().chat().id(), ChatAction.typing.name()));
 	}
