@@ -9,6 +9,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -48,7 +49,7 @@ public class ConnectAPI implements NetworkOperations {
 		return null;
 	}
 
-	public JsonArray sendPost(String login, String password) throws IOException {
+	public JsonElement sendPost(String login, String password) throws IOException {
 		final MediaType jsonMediaType = MediaType.parse("application/json");
 
 		try {
@@ -67,7 +68,7 @@ public class ConnectAPI implements NetworkOperations {
 
 			String res = response.body().string();
 
-			return new JsonParser().parse(res).getAsJsonArray();
+			return new JsonParser().parse(res);
 
 		} catch (Exception e) {
 			e.printStackTrace();

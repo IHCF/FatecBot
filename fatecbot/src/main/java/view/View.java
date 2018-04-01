@@ -17,6 +17,7 @@ import com.pengrad.telegrambot.response.GetUpdatesResponse;
 import controller.AbsenceController;
 import controller.AuthController;
 import controller.ProcessController;
+import controller.SchedulesController;
 import model.Model;
 import model.Observer;
 
@@ -93,6 +94,10 @@ public class View implements Observer {
 					setController(new AbsenceController(model, this));
 				}
 
+				else if (update.message().text().equals("Ver horários")) {
+					setController(new SchedulesController(model, this));
+				}
+
 			} else if (state == IS_REGISTERING) {
 				state = IS_REGISTERING_USERNAME;
 				update(update.message().chat().id(), "Insira sua senha do SIGA", false, true);
@@ -113,15 +118,13 @@ public class View implements Observer {
 		if (replyMessage) {
 			bot.execute(new SendMessage(chatId, message).replyMarkup(new ForceReply()));
 		} else if (keyBoard) {
-			bot.execute(new SendMessage(chatId, message)
-					.replyMarkup(new ReplyKeyboardMarkup(new KeyboardButton[] { new KeyboardButton("Ver faltas") })));
+			bot.execute(new SendMessage(chatId, message).replyMarkup(new ReplyKeyboardMarkup(
+					new KeyboardButton[] { new KeyboardButton("Ver faltas"), new KeyboardButton("Ver horários") })));
 		} else {
 			bot.execute(new SendMessage(chatId, message));
 		}
-
 	}
 
-	
 	public void sendTypingMessage(Update update) {
 		bot.execute(new SendChatAction(update.message().chat().id(), ChatAction.typing.name()));
 	}

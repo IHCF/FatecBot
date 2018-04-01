@@ -3,6 +3,7 @@ package model;
 import java.io.IOException;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 
 
 public interface NetworkOperations {
@@ -11,5 +12,5 @@ public interface NetworkOperations {
 
 	JsonArray sendGet() throws IOException;
 
-	JsonArray sendPost(String login, String password) throws IOException;
+	JsonElement sendPost(String login, String password) throws IOException;
 }
