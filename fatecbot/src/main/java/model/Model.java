@@ -40,6 +40,7 @@ public class Model implements Subject {
 	public void addUser(Long chatId, String name, String password) {
 		// ToDo: Adicionar o uso do ModelDAO. 
 		usersConnected.put(chatId, new String[] { name, password });
+		ModelDAO.createStudent(chatId, name, password);
 		notifyObserver(chatId, "Usuário cadastrado com sucesso. Utilize os botões para se comunicar comigo", true,
 				false);
 	}
