@@ -15,7 +15,8 @@ public class Model implements Subject {
 
 	private static Model uniqueInstance;
 
-	// Adicionado map para simular base de dados (Temporário)
+	// Adicionado map para simular base de dados (Temporário).
+	// Será substituido pela conexão com o ModelDAO.
 	Map<Long, String[]> usersConnected = new HashMap<Long, String[]>();
 	// Cria HashMap com os dias da Semana
 	private static final Map<Integer, String> WEEK_DAY;
@@ -27,7 +28,8 @@ public class Model implements Subject {
 		WEEK_DAY.put(4, "Quinta-feira");
 		WEEK_DAY.put(5, "Sexta-feira");
 	}
-
+	
+	// Tornando a classe Singleton.
 	public static Model getInstance() {
 		if (uniqueInstance == null) {
 			uniqueInstance = new Model();
@@ -36,14 +38,15 @@ public class Model implements Subject {
 	}
 
 	public void addUser(Long chatId, String name, String password) {
-		// ToDo: Adicionar forma de acesso ao SQLite
+		// ToDo: Adicionar o uso do ModelDAO. 
 		usersConnected.put(chatId, new String[] { name, password });
 		notifyObserver(chatId, "Usuário cadastrado com sucesso. Utilize os botões para se comunicar comigo", true,
 				false);
 	}
 
 	public String[] recoveryUser(Long chatId, boolean login) {
-
+		
+		// ToDo: Será substituido pelo ModelDAO.
 		String[] userInfo = usersConnected.get(chatId);
 
 		// Caso seja login e algum usuário tenha sido encontrado
@@ -110,7 +113,8 @@ public class Model implements Subject {
 				for (JsonElement element : schedules.getAsJsonObject().get("schedules").getAsJsonArray()) {
 
 					String diaDaSemana = WEEK_DAY.get(element.getAsJsonObject().get("weekday").getAsInt());
-
+					
+					// Verificação por conta do retorno da API, que no último valor retornado entrega null.
 					if (diaDaSemana != null) {
 						schedulesBuilder.append("Dia da semana: " + diaDaSemana + "\n");
 

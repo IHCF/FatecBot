@@ -21,8 +21,6 @@ import okhttp3.Response;
 
 public class ConnectAPI implements NetworkOperations {
 
-	private final String USER_AGENT = "Mozilla/50.0";
-
 	public JsonArray sendGet() throws IOException {
 		URL urlObj = new URL(URL_ADDRESS);
 		HttpsURLConnection conn = (HttpsURLConnection) urlObj.openConnection();
