@@ -1,27 +1,31 @@
 package model;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.text.ParseException;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import java.io.InputStream;
+import java.util.Properties;
 
 public class ToolBox {
-	
-	/**
-	 * 
-	 * @return JsonObject - Objeto Json com as informações do arquivo de configuração
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 * @throws ParseException
-	 */
-	public static JsonObject loadKeys() throws FileNotFoundException, IOException, ParseException {
 
-		JsonElement parser = new JsonParser().parse(new FileReader("config/keys.json"));
+	public static String loadTelegramKey() throws FileNotFoundException, IOException {
 
-		return parser.getAsJsonObject();
+		Properties prop = new Properties();
+		InputStream input = new FileInputStream("resources/telegram.properties");
+
+		prop.load(input);
+
+		return prop.getProperty("TELEGRAM_TOKEN");
+	}
+
+	public static String[] loadDataBaseConfigures() throws FileNotFoundException, IOException {
+
+		Properties prop = new Properties();
+		InputStream input = new FileInputStream("resources/database.properties");
+
+		prop.load(input);
+
+		return new String[] { prop.getProperty("URL") + prop.getProperty("DATABASE_NAME"), prop.getProperty("USER"),
+				prop.getProperty("PASSWORD") };
 	}
 }

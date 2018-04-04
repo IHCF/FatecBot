@@ -15,9 +15,6 @@ public class Model implements Subject {
 
 	private static Model uniqueInstance;
 
-	// Adicionado map para simular base de dados (Temporário).
-	// Será substituido pela conexão com o ModelDAO.
-	Map<Long, String[]> usersConnected = new HashMap<Long, String[]>();
 	// Cria HashMap com os dias da Semana
 	private static final Map<Integer, String> WEEK_DAY;
 	static {
@@ -28,7 +25,7 @@ public class Model implements Subject {
 		WEEK_DAY.put(4, "Quinta-feira");
 		WEEK_DAY.put(5, "Sexta-feira");
 	}
-	
+
 	// Tornando a classe Singleton.
 	public static Model getInstance() {
 		if (uniqueInstance == null) {
@@ -38,32 +35,43 @@ public class Model implements Subject {
 	}
 
 	public void addUser(Long chatId, String name, String password) {
-		// ToDo: Adicionar o uso do ModelDAO. 
-		usersConnected.put(chatId, new String[] { name, password });
-		ModelDAO.createStudent(chatId, name, password);
-		notifyObserver(chatId, "Usuário cadastrado com sucesso. Utilize os botões para se comunicar comigo", true,
-				false);
+
+		String message = "";
+		boolean keyboard = false;
+		try {
+			ModelDAO.createStudent(chatId, name, password);
+			message = "Usuário cadastrado com sucesso. Utilize os botões para se comunicar comigo";
+			keyboard = true;
+		} catch (Exception e) {
+			message = "Erro ao tentar adicionar seu usuário";
+		}
+
+		notifyObserver(chatId, message, keyboard, false);
 	}
 
 	public String[] recoveryUser(Long chatId, boolean login) {
-		
-		// ToDo: Será substituido pelo ModelDAO.
-		String[] userInfo = usersConnected.get(chatId);
 
-		// Caso seja login e algum usuário tenha sido encontrado
-		if (userInfo != null && login) {
-			notifyObserver(chatId, "Usuário encontrado! Agora basta utilizar os comandos, que coleto os dados do SIGA",
-					true, false);
+		try {
+			String[] userInfo = ModelDAO.selectStudent(chatId);
 
-			return userInfo;
-			// Caso seja login e nenhum usuário tenha sido encontrado
-		} else if (login) {
-			notifyObserver(chatId, "Não encontrei nenhum registro seu. Utilize o /registro para fazer o cadastro",
-					false, false);
-			return null;
-			// Caso a busca de usuário não seja no login, e algum usuário foi encontrado
-		} else if (userInfo != null && !login == true) {
-			return userInfo;
+			// Caso seja login e algum usuário tenha sido encontrado
+			if (userInfo != null && login) {
+				notifyObserver(chatId,
+						"Usuário encontrado! Agora basta utilizar os comandos, que coleto os dados do SIGA", true,
+						false);
+
+				return userInfo;
+				// Caso seja login e nenhum usuário tenha sido encontrado
+			} else if (login) {
+				notifyObserver(chatId, "Não encontrei nenhum registro seu. Utilize o /registro para fazer o cadastro",
+						false, false);
+				return null;
+				// Caso a busca de usuário não seja no login, e algum usuário foi encontrado
+			} else if (userInfo != null && !login == true) {
+				return userInfo;
+			}
+		} catch (Exception e) {
+			notifyObserver(chatId, "Erro ao tentar recuperar os dados", false, false);
 		}
 
 		return null;
@@ -114,8 +122,9 @@ public class Model implements Subject {
 				for (JsonElement element : schedules.getAsJsonObject().get("schedules").getAsJsonArray()) {
 
 					String diaDaSemana = WEEK_DAY.get(element.getAsJsonObject().get("weekday").getAsInt());
-					
-					// Verificação por conta do retorno da API, que no último valor retornado entrega null.
+
+					// Verificação por conta do retorno da API, que no último valor retornado
+					// entrega null.
 					if (diaDaSemana != null) {
 						schedulesBuilder.append("Dia da semana: " + diaDaSemana + "\n");
 
@@ -129,7 +138,7 @@ public class Model implements Subject {
 									.split("T");
 							schedulesBuilder.append("Horário de inicio: "
 									+ horarioInicio[1].substring(0, horarioInicio[1].length() - 5) + "\n");
-							
+
 							// Trata a string do horário de fim, devolvendo apenas a hora
 							String[] horarioFim = periodElement.getAsJsonObject().get("endAt").toString().split("T");
 							schedulesBuilder.append("Horário de término: "

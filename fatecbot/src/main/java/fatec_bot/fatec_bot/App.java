@@ -4,8 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 
-import com.google.gson.JsonObject;
-
 import model.Model;
 import model.ToolBox;
 import view.View;
@@ -13,19 +11,19 @@ import view.View;
 public class App {
 	public static void main(String[] args) throws IOException, ParseException {
 
-		JsonObject keys = null;
+		String telegramKey = null;
 		Model model = Model.getInstance();
 
 		try {
-			keys = ToolBox.loadKeys();
+			telegramKey = ToolBox.loadTelegramKey();
+			System.out.println(telegramKey);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		// Remove caracteres inválidos do Token e insere no View
-		View view = new View(keys.get("TELEGRAM_TOKEN").toString().replaceAll("\"", ""), model);
+		View view = new View(telegramKey, model);
 
 		System.out.println("Bot inicializado");
 
