@@ -43,8 +43,7 @@ public class Model implements Subject {
 			message = "Usuário cadastrado com sucesso. Utilize os botões para se comunicar comigo";
 			keyboard = true;
 		} catch (Exception e) {
-			// message = "Erro ao tentar adicionar seu usuário";
-			message = "Olha aqui: " + e.toString();
+			message = "Ops! Acho que você já está cadastrado! Utilize o /recuperar, assim consigo recuperar suas informações e continuar te ajudando.";
 		}
 
 		notifyObserver(chatId, message, keyboard, false);
