@@ -56,4 +56,15 @@ public class ModelDAO {
 		}
 		return student;
 	}
+
+	public static void deleteStudent(Long chatId) throws SQLException, FileNotFoundException, IOException {
+
+		String sql = "DELETE FROM aluno WHERE telegram_code = ?";
+
+		Connection conn = ModelDAO.connect();
+		PreparedStatement ps = conn.prepareStatement(sql);
+		ps.setString(1, Long.toString(chatId));
+
+		ps.executeUpdate();
+	}
 }

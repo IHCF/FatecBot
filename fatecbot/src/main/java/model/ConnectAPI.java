@@ -53,27 +53,22 @@ public class ConnectAPI implements NetworkOperations {
 	public JsonElement sendPost(String login, String password) throws IOException {
 		final MediaType jsonMediaType = MediaType.parse("application/json");
 
-		try {
-			JsonObject jsonObject = new JsonObject();
-			String url = ToolBox.loadApiKey();
-			jsonObject.addProperty("login", login);
-			jsonObject.addProperty("password", password);
+		JsonObject jsonObject = new JsonObject();
+		String url = ToolBox.loadApiKey();
+		jsonObject.addProperty("login", login);
+		jsonObject.addProperty("password", password);
 
-			RequestBody requestBody = RequestBody.create(jsonMediaType, new Gson().toJson(jsonObject));
+		RequestBody requestBody = RequestBody.create(jsonMediaType, new Gson().toJson(jsonObject));
 
-			OkHttpClient client = new OkHttpClient();
+		OkHttpClient client = new OkHttpClient();
 
-			Request request = new Request.Builder().url(url).post(requestBody)
-					.addHeader("content-type", "application/json").build();
+		Request request = new Request.Builder().url(url).post(requestBody).addHeader("content-type", "application/json")
+				.build();
 
-			Response response = client.newCall(request).execute();
+		Response response = client.newCall(request).execute();
 
-			String res = response.body().string();
-			return new JsonParser().parse(res);
+		String res = response.body().string();
+		return new JsonParser().parse(res);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 }

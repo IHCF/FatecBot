@@ -31,6 +31,8 @@ public class AuthController implements ProcessController {
 				if (student != null) {
 					sigaId = student.getSigaId();
 					password = student.getPasswordSiga();
+				} else {
+					view.setState(State.IS_NOTHING.getState());
 				}
 			} else if (view.getState() == State.IS_REGISTERING_USERNAME.getState()) {
 				sigaId = update.message().text();
@@ -40,7 +42,6 @@ public class AuthController implements ProcessController {
 
 			if (sigaId != null && password != null) {
 				if (view.getState() != State.IS_RECOVERY_USER.getState()) {
-					System.out.println("Entrei aqui");
 					model.addUser(update.message().chat().id(), update.message().chat().firstName(), sigaId, password);
 				}
 				view.setState(State.IS_NOTHING.getState());

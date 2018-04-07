@@ -77,6 +77,15 @@ public class Model implements Subject {
 		return null;
 	}
 
+	public void removeUser(Long chatId) {
+		try {
+			ModelDAO.deleteStudent(chatId);
+		} catch (Exception e) {
+			notifyObserver(chatId, "Eita! Tipo um problema ao tentar remover seu usuário. Tente novamente mais tarde",
+					false, false);
+		}
+	}
+
 	public void getAbsenses(Long chatId) {
 		Student student = recoveryUser(chatId, false);
 
