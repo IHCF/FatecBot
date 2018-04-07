@@ -34,41 +34,42 @@ public class Model implements Subject {
 		return uniqueInstance;
 	}
 
-	public void addUser(Long chatId, String name, String password) {
+	public void addUser(Long chatId, String nick, String sigaId, String password) {
 
 		String message = "";
 		boolean keyboard = false;
 		try {
-			ModelDAO.createStudent(chatId, name, password);
+			ModelDAO.createStudent(chatId, nick, sigaId, password);
 			message = "Usuário cadastrado com sucesso. Utilize os botões para se comunicar comigo";
 			keyboard = true;
 		} catch (Exception e) {
-			message = "Erro ao tentar adicionar seu usuário";
+			// message = "Erro ao tentar adicionar seu usuário";
+			message = "Olha aqui: " + e.toString();
 		}
 
 		notifyObserver(chatId, message, keyboard, false);
 	}
 
-	public String[] recoveryUser(Long chatId, boolean login) {
+	public Student recoveryUser(Long chatId, boolean login) {
 
 		try {
-			String[] userInfo = ModelDAO.selectStudent(chatId);
+			Student student = ModelDAO.selectStudent(chatId);
 
 			// Caso seja login e algum usuário tenha sido encontrado
-			if (userInfo != null && login) {
+			if (student != null && login) {
 				notifyObserver(chatId,
 						"Usuário encontrado! Agora basta utilizar os comandos, que coleto os dados do SIGA", true,
 						false);
 
-				return userInfo;
+				return student;
 				// Caso seja login e nenhum usuário tenha sido encontrado
 			} else if (login) {
 				notifyObserver(chatId, "Não encontrei nenhum registro seu. Utilize o /registro para fazer o cadastro",
 						false, false);
 				return null;
 				// Caso a busca de usuário não seja no login, e algum usuário foi encontrado
-			} else if (userInfo != null && !login == true) {
-				return userInfo;
+			} else if (student != null && !login == true) {
+				return student;
 			}
 		} catch (Exception e) {
 			notifyObserver(chatId, "Erro ao tentar recuperar os dados", false, false);
@@ -78,14 +79,14 @@ public class Model implements Subject {
 	}
 
 	public void getAbsenses(Long chatId) {
-		String[] userInfo = recoveryUser(chatId, false);
+		Student student = recoveryUser(chatId, false);
 
-		if (userInfo != null) {
+		if (student != null) {
 			StringBuilder absensesBuilder = new StringBuilder();
 			absensesBuilder.append("Suas faltas: \n");
 			try {
 				// Recupera as informações da API
-				JsonElement absenses = api.sendPost(userInfo[0], userInfo[1]);
+				JsonElement absenses = api.sendPost(student.getSigaId(), student.getPasswordSiga());
 
 				for (JsonElement element : absenses.getAsJsonObject().get("disciplines").getAsJsonArray()) {
 					absensesBuilder.append("Matéria: " + element.getAsJsonObject().get("name") + "\n");
@@ -110,14 +111,14 @@ public class Model implements Subject {
 	}
 
 	public void getSchedules(Long chatId) {
-		String[] userInfo = recoveryUser(chatId, false);
+		Student student = recoveryUser(chatId, false);
 
-		if (userInfo != null) {
+		if (student != null) {
 			StringBuilder schedulesBuilder = new StringBuilder();
 			schedulesBuilder.append("Suas aulas\n");
 			try {
 				// Recupera as informações da API
-				JsonElement schedules = api.sendPost(userInfo[0], userInfo[1]);
+				JsonElement schedules = api.sendPost(student.getSigaId(), student.getPasswordSiga());
 
 				for (JsonElement element : schedules.getAsJsonObject().get("schedules").getAsJsonArray()) {
 

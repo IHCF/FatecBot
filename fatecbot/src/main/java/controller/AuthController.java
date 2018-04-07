@@ -3,6 +3,8 @@ package controller;
 import com.pengrad.telegrambot.model.Update;
 
 import model.Model;
+import model.State;
+import model.Student;
 import view.View;
 
 public class AuthController implements ProcessController {
@@ -10,7 +12,7 @@ public class AuthController implements ProcessController {
 	private Model model;
 	private View view;
 
-	private String name = null;
+	private String sigaId = null;
 	private String password = null;
 
 	public AuthController(Model model, View view) {
@@ -19,28 +21,31 @@ public class AuthController implements ProcessController {
 	}
 
 	public void process(Update update) {
-		view.sendTypingMessage(update);
+		if (view.getState() != State.IS_NOTHING.getState()) {
+			view.sendTypingMessage(update);
 
-		if (view.getState() == View.IS_RECOVERY_USER) {
-			String[] userInfo = model.recoveryUser(update.message().chat().id(), true);
+			if (view.getState() == State.IS_RECOVERY_USER.getState()) {
+				Student student = model.recoveryUser(update.message().chat().id(), true);
 
-			// Verificando se o usuário está registrado
-			if (userInfo != null) {
-				name = userInfo[0];
-				password = userInfo[1];
+				// Verificando se o usuário está registrado
+				if (student != null) {
+					sigaId = student.getSigaId();
+					password = student.getPasswordSiga();
+				}
+			} else if (view.getState() == State.IS_REGISTERING_USERNAME.getState()) {
+				sigaId = update.message().text();
+			} else if (view.getState() == State.IS_REGISTERING_PASSWORD.getState()) {
+				password = update.message().text();
 			}
-			// Retorna o estado original do bot.
-			view.setState(View.IS_NOTHING);
 
-		} else if (view.getState() == View.IS_REGISTERING_USERNAME) {
-			name = update.message().text();
-		} else if (view.getState() == View.IS_REGISTERING_PASSWORD) {
-			password = update.message().text();
+			if (sigaId != null && password != null) {
+				if (view.getState() != State.IS_RECOVERY_USER.getState()) {
+					System.out.println("Entrei aqui");
+					model.addUser(update.message().chat().id(), update.message().chat().firstName(), sigaId, password);
+				}
+				view.setState(State.IS_NOTHING.getState());
+			}
 		}
 
-		if (name != null && password != null) {
-			model.addUser(update.message().chat().id(), name, password);
-			view.setState(View.IS_NOTHING);
-		}
 	}
 }

@@ -1,6 +1,7 @@
 package model;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -21,8 +22,11 @@ import okhttp3.Response;
 
 public class ConnectAPI implements NetworkOperations {
 
-	public JsonArray sendGet() throws IOException {
-		URL urlObj = new URL(URL_ADDRESS);
+	public JsonArray sendGet() throws FileNotFoundException, IOException {
+
+		String url = ToolBox.loadApiKey();
+
+		URL urlObj = new URL(url);
 		HttpsURLConnection conn = (HttpsURLConnection) urlObj.openConnection();
 		conn.setRequestMethod("GET");
 		conn.setRequestProperty("User-Agent", USER_AGENT);
@@ -40,7 +44,6 @@ public class ConnectAPI implements NetworkOperations {
 			}
 
 			input.close();
-
 			return new JsonParser().parse(response.toString()).getAsJsonArray();
 		}
 
@@ -52,6 +55,7 @@ public class ConnectAPI implements NetworkOperations {
 
 		try {
 			JsonObject jsonObject = new JsonObject();
+			String url = ToolBox.loadApiKey();
 			jsonObject.addProperty("login", login);
 			jsonObject.addProperty("password", password);
 
@@ -59,13 +63,12 @@ public class ConnectAPI implements NetworkOperations {
 
 			OkHttpClient client = new OkHttpClient();
 
-			Request request = new Request.Builder().url(URL_ADDRESS).post(requestBody)
+			Request request = new Request.Builder().url(url).post(requestBody)
 					.addHeader("content-type", "application/json").build();
 
 			Response response = client.newCall(request).execute();
 
 			String res = response.body().string();
-
 			return new JsonParser().parse(res);
 
 		} catch (Exception e) {

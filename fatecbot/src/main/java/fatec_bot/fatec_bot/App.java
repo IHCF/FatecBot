@@ -16,7 +16,6 @@ public class App {
 
 		try {
 			telegramKey = ToolBox.loadTelegramKey();
-			System.out.println(telegramKey);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

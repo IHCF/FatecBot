@@ -11,7 +11,7 @@ public class ToolBox {
 	public static String loadTelegramKey() throws FileNotFoundException, IOException {
 
 		Properties prop = new Properties();
-		InputStream input = new FileInputStream("resources/telegram.properties");
+		InputStream input = new FileInputStream("src/main/resources/telegram.properties");
 
 		prop.load(input);
 
@@ -21,11 +21,21 @@ public class ToolBox {
 	public static String[] loadDataBaseConfigures() throws FileNotFoundException, IOException {
 
 		Properties prop = new Properties();
-		InputStream input = new FileInputStream("resources/database.properties");
+		InputStream input = new FileInputStream("src/main/resources/database.properties");
 
 		prop.load(input);
 
 		return new String[] { prop.getProperty("URL") + prop.getProperty("DATABASE_NAME"), prop.getProperty("USER"),
 				prop.getProperty("PASSWORD") };
+	}
+
+	public static String loadApiKey() throws FileNotFoundException, IOException {
+
+		Properties prop = new Properties();
+		InputStream input = new FileInputStream("src/main/resources/api.properties");
+
+		prop.load(input);
+
+		return prop.getProperty("URL_ADDRESS");
 	}
 }

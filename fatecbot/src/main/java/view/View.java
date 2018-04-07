@@ -9,10 +9,8 @@ import com.pengrad.telegrambot.model.request.ChatAction;
 import com.pengrad.telegrambot.model.request.ForceReply;
 import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
-import com.pengrad.telegrambot.request.GetUpdates;
 import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.response.GetUpdatesResponse;
 
 import controller.AbsenceController;
 import controller.AuthController;
@@ -20,22 +18,14 @@ import controller.ProcessController;
 import controller.SchedulesController;
 import model.Model;
 import model.Observer;
+import model.State;
 
 public class View implements Observer {
 
 	private Model model;
 
-	public static final Integer IS_NOTHING = 0;
-	public static final Integer IS_REGISTERING = 1;
-	public static final Integer IS_REGISTERING_USERNAME = 2;
-	public static final Integer IS_REGISTERING_PASSWORD = 3;
-	public static final Integer IS_SEARCHING = 4;
-	public static final Integer IS_RECOVERY_USER = 5;
-
 	private TelegramBot bot;
-	private Integer state = IS_NOTHING;
-	private Integer offSet = 0;
-	private GetUpdatesResponse updatesResponse;
+	private Integer state = State.IS_NOTHING.getState();
 
 	private ProcessController processController;
 
@@ -51,13 +41,13 @@ public class View implements Observer {
 	 */
 	public void receiveUsersMessages() {
 		bot.setUpdatesListener(new UpdatesListener() {
-			public int process(List<Update> arg0) {
+			public int process(List<Update> updates) {
 				try {
-					processConversation();
+					processConversation(updates);
 				} catch (Exception e) {
 					System.out.println("Erro: " + e);
 				}
-				return UpdatesListener.CONFIRMED_UPDATES_ALL;
+				return CONFIRMED_UPDATES_ALL;
 			}
 		});
 	}
@@ -65,12 +55,10 @@ public class View implements Observer {
 	/**
 	 * Método utilizado para processar cada uma das informações recebidas do Chat
 	 */
-	public void processConversation() {
-		updatesResponse = bot.execute(new GetUpdates().limit(100).offset(offSet));
-		List<Update> updates = updatesResponse.updates();
+	private void processConversation(List<Update> updates) {
 		for (Update update : updates) {
 
-			if (state == IS_NOTHING) {
+			if (state == State.IS_NOTHING.getState()) {
 
 				if (update.message().text().equals("/start")) {
 					update(update.message().chat().id(),
@@ -82,12 +70,12 @@ public class View implements Observer {
 				}
 
 				else if (update.message().text().equals("/registro")) {
-					state = IS_REGISTERING;
+					state = State.IS_REGISTERING.getState();
 					update(update.message().chat().id(), "Insira seu nome de usuário do SIGA", false, true);
 				}
 
 				else if (update.message().text().equals("/recuperar")) {
-					state = IS_RECOVERY_USER;
+					state = State.IS_RECOVERY_USER.getState();
 				}
 
 				else if (update.message().text().equals("Ver faltas")) {
@@ -98,16 +86,15 @@ public class View implements Observer {
 					setController(new SchedulesController(model, this));
 				}
 
-			} else if (state == IS_REGISTERING) {
-				state = IS_REGISTERING_USERNAME;
+			} else if (state == State.IS_REGISTERING.getState()) {
+				state = State.IS_REGISTERING_USERNAME.getState();
 				update(update.message().chat().id(), "Insira sua senha do SIGA", false, true);
-			} else if (state == IS_REGISTERING_USERNAME) {
-				state = IS_REGISTERING_PASSWORD;
+			} else if (state == State.IS_REGISTERING_USERNAME.getState()) {
+				state = State.IS_REGISTERING_PASSWORD.getState();
 			}
-
 			processController.process(update);
-			offSet = update.updateId() + 1;
 		}
+
 	}
 
 	/**
@@ -140,5 +127,4 @@ public class View implements Observer {
 	public Integer getState() {
 		return state;
 	}
-
 }

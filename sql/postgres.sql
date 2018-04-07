@@ -1,16 +1,15 @@
 CREATE SEQUENCE aluno_seq;
 
 CREATE TABLE aluno(
-	aluno_id INT NOT NULL DEFAULT NEXTVAL ('aluno_seq'),
-    telegram_code TEXT NOT NULL,
+    aluno_id INT NOT NULL DEFAULT NEXTVAL ('aluno_seq'),
+    telegram_code TEXT UNIQUE NOT NULL,
     nome VARCHAR(120),
     usuario_siga VARCHAR(120),
     senha_siga VARCHAR(120),
-    ultima_atualizacao DATE,
+    ultima_atualizacao VARCHAR(120),
     ativo SMALLINT DEFAULT 1,
     PRIMARY KEY (aluno_id)
 );
-
 
 CREATE SEQUENCE materia_seq;
 

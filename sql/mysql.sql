@@ -1,8 +1,6 @@
 # Criando banco de dados
 CREATE DATABASE users;
-
 use users;
-
 # Criando tabelass
 CREATE TABLE aluno(
 	aluno_id INT NOT NULL AUTO_INCREMENT,
