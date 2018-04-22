@@ -19,7 +19,6 @@ import controller.ProcessController;
 import controller.SchedulesController;
 import model.Model;
 import model.Observer;
-import model.State;
 
 public class View implements Observer {
 

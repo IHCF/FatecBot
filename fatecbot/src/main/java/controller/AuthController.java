@@ -3,8 +3,8 @@ package controller;
 import com.pengrad.telegrambot.model.Update;
 
 import model.Model;
-import model.State;
 import model.Student;
+import view.State;
 import view.View;
 
 public class AuthController implements ProcessController {
