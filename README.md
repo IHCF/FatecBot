@@ -18,7 +18,7 @@ Há outros projetos que tem a mesma finalidade, que também foram criados por n�
 
 Todos esses projetos auxiliam os alunos a ter acesso aos dados do SIGA. Este projeto foi feito como parte da matéria de Engenharia de software 3 :sunglasses:
  
-## Demonstração da utilização :arrow_forward:
+## Demonstração de uso :arrow_forward:
 
 ```Iniciando conversa```
 
