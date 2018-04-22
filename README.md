@@ -17,3 +17,40 @@ Há outros projetos que tem a mesma finalidade, que também foram criados por n�
 - [Fatec Posso Faltar Bot](https://github.com/IHCF/posso-faltar-bot) :rage4:
 
 Todos esses projetos auxiliam os alunos a ter acesso aos dados do SIGA. Este projeto foi feito como parte da matéria de Engenharia de software 3 :sunglasses:
+ 
+## Demonstração da utilização :arrow_forward:
+
+```Iniciando conversa```
+
+![Start](imagens_bot/start.png)
+
+
+``` Realizando cadastro ```
+
+![Cadastro](imagens_bot/cadastro_1.png)
+
+``` Recuperando cadastro (Caso já tenha utilizado o bot antes) ```
+
+![Recuperando](imagens_bot/recuperar_1.png)
+
+``` Botões para interação com o bot ```
+
+![Botoes](imagens_bot/botoes_1.png)
+
+``` Verificando faltas ```
+
+![Faltas](imagens_bot/faltas_1.PNG)
+
+``` Verificando horários de aula ```
+
+![Horarios](imagens_bot/horarios_1.png)
+
+
+## Diagramas do sistema :clipboard:
+
+``` Bot ```
+![Diagrama](diagramas/classes.PNG)
+
+
+``` Banco de dados ```
+![Banco](diagramas/banco_de_dados.png)
