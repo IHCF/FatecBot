@@ -71,10 +71,12 @@ public class View implements Observer {
 				else if (update.message().text().equals("/registro")) {
 					state = State.IS_REGISTERING.getState();
 					update(update.message().chat().id(), "Insira seu nome de usuário do SIGA", false, true);
+					setController(new AuthController(model, this));
 				}
 
 				else if (update.message().text().equals("/recuperar")) {
 					state = State.IS_RECOVERY_USER.getState();
+					setController(new AuthController(model, this));
 				}
 
 				else if (update.message().text().equals("Ver faltas")) {
