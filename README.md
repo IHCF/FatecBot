@@ -51,7 +51,7 @@ Todos esses projetos auxiliam os alunos a ter acesso aos dados do SIGA. Este pro
 ``` Bot ```
 
 
-![Diagrama](diagramas/classes_2.PNG)
+![Diagrama](diagramas/classes_3.PNG)
 
 
 
