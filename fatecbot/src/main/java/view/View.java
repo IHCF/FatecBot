@@ -18,7 +18,6 @@ import controller.DeleteController;
 import controller.ProcessController;
 import controller.SchedulesController;
 import model.Model;
-import model.Observer;
 
 public class View implements Observer {
 

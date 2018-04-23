@@ -8,6 +8,8 @@ import java.util.Map;
 
 import com.google.gson.JsonElement;
 
+import view.Observer;
+
 public class Model implements Subject {
 
 	private ConnectAPI api = new ConnectAPI();

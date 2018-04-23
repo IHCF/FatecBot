@@ -51,7 +51,7 @@ Todos esses projetos auxiliam os alunos a ter acesso aos dados do SIGA. Este pro
 ``` Bot ```
 
 
-![Diagrama](https://github.com/IHCF/FatecBot/blob/master/diagramas/classes_3.png)
+![Diagrama](https://github.com/IHCF/FatecBot/blob/master/diagramas/classes_4.png)
 
 
 
