@@ -3,11 +3,15 @@ package model;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -29,35 +33,36 @@ public class ForecastSearch implements Information {
 		this.listCity = listCity;
 	}
 
-	private URL BuiltUrlCidade() throws MalformedURLException {
+	private URL builtUrlCidade() throws MalformedURLException {
 		return new URL(UriComponentsBuilder.newInstance().scheme(PROTOCOL).host(INPE_API_FORECAST)
 				.path(INPE_API_FORECAST_PATH).toUriString());
 	}
 
-	public String getResponseFromHttpUrl() throws MalformedURLException {
+	public ForecastCity getForecast() throws MalformedURLException, JAXBException, IOException {
 
-		URL url = BuiltUrlCidade();
+		// Cria a URL que será utilizada
+		URL url = builtUrlCidade();
+		JAXBContext jaxbContext;
+		Unmarshaller unmarshaller;
 		parse = null;
 		StringBuffer responseBuffer = new StringBuffer();
 
-		try {
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+		con.setRequestProperty("User-Agent", USER_AGENT);
 
-			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			con.setRequestMethod("GET");
-			con.setRequestProperty("User-Agent", USER_AGENT);
+		parse = new BufferedReader(new InputStreamReader(con.getInputStream()));
 
-			parse = new BufferedReader(new InputStreamReader(con.getInputStream()));
-
-			String inputLine;
-			while ((inputLine = parse.readLine()) != null) {
-				responseBuffer.append(inputLine);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		String inputLine;
+		while ((inputLine = parse.readLine()) != null) {
+			responseBuffer.append(inputLine);
 		}
 
-		// ToDo: Colocar novo try-catch
-
-		return responseBuffer.toString();
+		jaxbContext = JAXBContext.newInstance(ForecastSearch.class);
+		unmarshaller = jaxbContext.createUnmarshaller();
+		StringReader reader = new StringReader(responseBuffer.toString());
+		ForecastCity city = (ForecastCity) unmarshaller.unmarshal(reader);
+	
+		return city;
 	}
 }

@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBException;
+
 import com.google.gson.JsonElement;
 
 import view.Observer;
@@ -13,6 +15,7 @@ import view.Observer;
 public class Model implements Subject {
 
 	private ConnectAPI api = new ConnectAPI();
+	private ForecastSearch fSearch = new ForecastSearch();
 	private List<Observer> observers = new LinkedList<Observer>();
 
 	private static Model uniqueInstance;
@@ -86,6 +89,7 @@ public class Model implements Subject {
 			notifyObserver(chatId, "Eita! Tipo um problema ao tentar remover seu usuário. Tente novamente mais tarde",
 					false, false);
 		}
+		notifyObserver(chatId, "Usuário revogado com sucesso!", false, false);
 	}
 
 	public void getAbsenses(Long chatId) {
@@ -168,6 +172,23 @@ public class Model implements Subject {
 		} else {
 			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registrar para fazer o cadastro",
 					false, false);
+		}
+	}
+
+	public void searchForecast(Long chatId) {
+		try {
+			ForecastCity city = fSearch.getForecast();
+			notifyObserver(chatId, "Buscando os dados da cidade de: " + city.getNome(), false, false);
+			notifyObserver(chatId, city.getUf(), false, false);
+
+			notifyObserver(chatId, "Veja a previsão para os próximos 7 dias", false, false);
+			for (Forecast forecast : city.getPrevisao()) {
+				notifyObserver(chatId, "Mínima: " + forecast.getMinima() + " Máxima: " + forecast.getMaxima(), false,
+						false);
+			}
+
+		} catch (JAXBException | IOException e) {
+			e.printStackTrace();
 		}
 	}
 

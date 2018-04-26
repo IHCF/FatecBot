@@ -83,11 +83,17 @@ public class View implements Observer {
 					setController(new AbsenceController(model, this));
 				}
 
-				else if (update.message().text().equals("Ver horários")) {
+				else if (update.message().text().equals("Ver horário")) {
 					setController(new SchedulesController(model, this));
 				}
 
-				else if (update.message().text().equals("Remover usuário")) {
+				else if (update.message().text().equals("Configurações")) {
+					update(update.message().chat().id(),
+							"As opções de configuração disponíveis são as seguintes: \n\n /remove - Comando para revogar acesso do bot aos dados do SIGA",
+							false, false);
+				}
+
+				else if (update.message().text().equals("/remove")) {
 					setController(new DeleteController(model, this));
 				}
 
@@ -110,9 +116,11 @@ public class View implements Observer {
 		if (replyMessage) {
 			bot.execute(new SendMessage(chatId, message).replyMarkup(new ForceReply()));
 		} else if (keyBoard) {
-			bot.execute(new SendMessage(chatId, message)
-					.replyMarkup(new ReplyKeyboardMarkup(new KeyboardButton[] { new KeyboardButton("Ver faltas"),
-							new KeyboardButton("Ver horários"), new KeyboardButton("Remover usuário") })));
+			bot.execute(new SendMessage(chatId, message).replyMarkup(new ReplyKeyboardMarkup(
+					new KeyboardButton[] { new KeyboardButton("Ver faltas"), new KeyboardButton("Ver horário") },
+					new KeyboardButton[] { new KeyboardButton("Posso faltar ?"),
+							new KeyboardButton("Relatório escolar") },
+					new KeyboardButton[] { new KeyboardButton("Configurações") })));
 		} else {
 			bot.execute(new SendMessage(chatId, message));
 		}
