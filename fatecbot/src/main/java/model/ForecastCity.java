@@ -44,6 +44,10 @@ public class ForecastCity implements Information {
 		return previsao;
 	}
 
+	public Forecast first() {
+		return previsao.get(0);
+	}
+
 	@XmlElement
 	public void setPrevisao(List<Forecast> previsao) {
 		this.previsao = previsao;

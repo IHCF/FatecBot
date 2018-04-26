@@ -17,6 +17,7 @@ import controller.AuthController;
 import controller.DeleteController;
 import controller.ProcessController;
 import controller.SchedulesController;
+import controller.WantAbsenceController;
 import model.Model;
 
 public class View implements Observer {
@@ -96,6 +97,11 @@ public class View implements Observer {
 				else if (update.message().text().equals("/remove")) {
 					setController(new DeleteController(model, this));
 				}
+				
+				else if (update.message().text().equals("Posso faltar ?")) {
+					setController(new WantAbsenceController(model, this));
+				}
+				
 
 			} else if (state == State.IS_REGISTERING.getState()) {
 				state = State.IS_REGISTERING_USERNAME.getState();

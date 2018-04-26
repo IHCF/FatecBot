@@ -6,8 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBException;
-
 import com.google.gson.JsonElement;
 
 import view.Observer;
@@ -175,21 +173,8 @@ public class Model implements Subject {
 		}
 	}
 
-	public void searchForecast(Long chatId) {
-		try {
-			ForecastCity city = fSearch.getForecast();
-			notifyObserver(chatId, "Buscando os dados da cidade de: " + city.getNome(), false, false);
-			notifyObserver(chatId, city.getUf(), false, false);
+	public void wantAbsence(Long chatId) {
 
-			notifyObserver(chatId, "Veja a previsão para os próximos 7 dias", false, false);
-			for (Forecast forecast : city.getPrevisao()) {
-				notifyObserver(chatId, "Mínima: " + forecast.getMinima() + " Máxima: " + forecast.getMaxima(), false,
-						false);
-			}
-
-		} catch (JAXBException | IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public void registerObserver(Observer observer) {
