@@ -14,6 +14,7 @@ import view.Observer;
 public class Model implements Subject {
 
 	private ConnectAPI api = new ConnectAPI();
+	private ForecastSearch fSearch = new ForecastSearch();
 	private List<Observer> observers = new LinkedList<Observer>();
 
 	private static Model uniqueInstance;
@@ -97,6 +98,7 @@ public class Model implements Subject {
 			notifyObserver(chatId, "Eita! Tipo um problema ao tentar remover seu usuário. Tente novamente mais tarde",
 					false, false, false);
 		}
+		notifyObserver(chatId, "Usuário revogado com sucesso!", false, false, false);
 	}
 
 	public void getAbsenses(Long chatId) {
@@ -214,6 +216,10 @@ public class Model implements Subject {
 			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registrar para fazer o cadastro",
 					false, false, false);
 		}
+	}
+
+	public void wantAbsence(Long chatId) {
+
 	}
 
 	public void registerObserver(Observer observer) {

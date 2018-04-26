@@ -59,7 +59,8 @@ public class ModelDAO {
 
 	public static void deleteStudent(Long chatId) throws SQLException, FileNotFoundException, IOException {
 
-		String sql = "DELETE FROM aluno WHERE telegram_code = ?";
+		// Aplicado desta forma para gerar o softdelete
+		String sql = "UPDATE aluno SET ativo = 0 WHERE telegram_code = ?";
 
 		Connection conn = ModelDAO.connect();
 		PreparedStatement ps = conn.prepareStatement(sql);
