@@ -1,5 +1,6 @@
 package view;
 
+import java.io.File;
 import java.util.List;
 
 import com.pengrad.telegrambot.TelegramBot;
@@ -11,10 +12,12 @@ import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendDocument;
 
 import controller.AbsenceController;
 import controller.AuthController;
 import controller.DeleteController;
+import controller.HistoryController;
 import controller.ProcessController;
 import controller.SchedulesController;
 import model.Model;
@@ -44,6 +47,7 @@ public class View implements Observer {
 				try {
 					processConversation(updates);
 				} catch (Exception e) {
+					e.printStackTrace();
 					System.out.println("Erro: " + e);
 				}
 				return CONFIRMED_UPDATES_ALL;
@@ -64,13 +68,13 @@ public class View implements Observer {
 							"Olá, seja bem-vindo ao FatecBot, assistente simples e fácil de utilizar,"
 									+ " vou te ajudar com o SIGA. Para que eu tenha acesso as suas informações"
 									+ " faça o registro utilizando o comando: \n/registro, caso já seja registrado use:  /recuperar",
-							false, false);
+							false, false, false);
 					setController(new AuthController(model, this));
 				}
 
 				else if (update.message().text().equals("/registro")) {
 					state = State.IS_REGISTERING.getState();
-					update(update.message().chat().id(), "Insira seu nome de usuário do SIGA", false, true);
+					update(update.message().chat().id(), "Insira seu nome de usuário do SIGA", false, true, false);
 					setController(new AuthController(model, this));
 				}
 
@@ -91,9 +95,13 @@ public class View implements Observer {
 					setController(new DeleteController(model, this));
 				}
 
+				else if (update.message().text().equals("Gerar histórico")) {
+					setController(new HistoryController(model, this));
+				}
+
 			} else if (state == State.IS_REGISTERING.getState()) {
 				state = State.IS_REGISTERING_USERNAME.getState();
-				update(update.message().chat().id(), "Insira sua senha do SIGA", false, true);
+				update(update.message().chat().id(), "Insira sua senha do SIGA", false, true, false);
 			} else if (state == State.IS_REGISTERING_USERNAME.getState()) {
 				state = State.IS_REGISTERING_PASSWORD.getState();
 			}
@@ -105,16 +113,18 @@ public class View implements Observer {
 	/**
 	 * Método que recebe informações que devem ser pasadas ao usuário.
 	 */
-	public void update(long chatId, String message, boolean keyBoard, boolean replyMessage) {
+	public void update(long chatId, Object message, boolean keyBoard, boolean replyMessage, boolean isDocument) {
 
 		if (replyMessage) {
-			bot.execute(new SendMessage(chatId, message).replyMarkup(new ForceReply()));
+			bot.execute(new SendMessage(chatId, (String) message).replyMarkup(new ForceReply()));
 		} else if (keyBoard) {
-			bot.execute(new SendMessage(chatId, message)
+			bot.execute(new SendMessage(chatId, (String) message)
 					.replyMarkup(new ReplyKeyboardMarkup(new KeyboardButton[] { new KeyboardButton("Ver faltas"),
-							new KeyboardButton("Ver horários"), new KeyboardButton("Remover usuário") })));
+							new KeyboardButton("Ver horários"), new KeyboardButton("Remover usuário"), new KeyboardButton("Gerar histórico") })));
+		} else if (isDocument) {
+			bot.execute(new SendDocument(chatId, (File) message));
 		} else {
-			bot.execute(new SendMessage(chatId, message));
+			bot.execute(new SendMessage(chatId, (String) message));
 		}
 	}
 

@@ -1,5 +1,6 @@
 package model;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -27,6 +28,16 @@ public class Model implements Subject {
 		WEEK_DAY.put(4, "Quinta-feira");
 		WEEK_DAY.put(5, "Sexta-feira");
 	}
+	
+	// Cria HashMap com os estados da disciplina
+	private static final Map<String, String> DISCIPLINE_STATE;
+	static {
+		DISCIPLINE_STATE = new HashMap<String, String>();
+		DISCIPLINE_STATE.put("approved", "Aprovado");
+		DISCIPLINE_STATE.put("attending", "Em Curso");
+		DISCIPLINE_STATE.put("not-attended", "Não cursado");
+		DISCIPLINE_STATE.put("dismissed", "Dispensado");
+	}
 
 	// Tornando a classe Singleton.
 	public static Model getInstance() {
@@ -48,7 +59,7 @@ public class Model implements Subject {
 			message = "Ops! Acho que você já está cadastrado! Utilize o /recuperar, assim consigo recuperar suas informações e continuar te ajudando.";
 		}
 
-		notifyObserver(chatId, message, keyboard, false);
+		notifyObserver(chatId, message, keyboard, false, false);
 	}
 
 	public Student recoveryUser(Long chatId, boolean login) {
@@ -60,20 +71,20 @@ public class Model implements Subject {
 			if (student != null && login) {
 				notifyObserver(chatId,
 						"Usuário encontrado! Agora basta utilizar os comandos, que coleto os dados do SIGA", true,
-						false);
+						false, false);
 
 				return student;
 				// Caso seja login e nenhum usuário tenha sido encontrado
 			} else if (login) {
 				notifyObserver(chatId, "Não encontrei nenhum registro seu. Utilize o /registro para fazer o cadastro",
-						false, false);
+						false, false, false);
 				return null;
 				// Caso a busca de usuário não seja no login, e algum usuário foi encontrado
 			} else if (student != null && !login == true) {
 				return student;
 			}
 		} catch (Exception e) {
-			notifyObserver(chatId, "Erro ao tentar recuperar os dados", false, false);
+			notifyObserver(chatId, "Erro ao tentar recuperar os dados", false, false, false);
 		}
 
 		return null;
@@ -84,7 +95,7 @@ public class Model implements Subject {
 			ModelDAO.deleteStudent(chatId);
 		} catch (Exception e) {
 			notifyObserver(chatId, "Eita! Tipo um problema ao tentar remover seu usuário. Tente novamente mais tarde",
-					false, false);
+					false, false, false);
 		}
 	}
 
@@ -109,14 +120,48 @@ public class Model implements Subject {
 				// Caso a API não consiga entregar informações do usuário
 				notifyObserver(chatId,
 						"Acho que não consegui recuperar suas informações =(. Se precisar utilize /registrar novamente!",
-						false, false);
+						false, false, false);
 			}
 
-			notifyObserver(chatId, absensesBuilder.toString(), true, false);
+			notifyObserver(chatId, absensesBuilder.toString(), true, false, false);
 
 		} else {
 			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registrar para fazer o cadastro",
-					false, false);
+					false, false, false);
+		}
+	}
+
+
+	public void generateHistory(Long chatId) {
+		Student student = recoveryUser(chatId, false);
+		
+		if (student != null) {
+			StringBuilder stringBuilder = new StringBuilder();
+			try {
+				// Recupera as informações da API
+				JsonElement response = api.sendPost(student.getSigaId(), student.getPasswordSiga());
+				JsonElement history = response.getAsJsonObject().get("history");
+
+				for (JsonElement entry : history.getAsJsonObject().get("entries").getAsJsonArray()) {
+					JsonElement discipline = entry.getAsJsonObject().get("discipline");
+					stringBuilder.append(discipline.getAsJsonObject().get("code").getAsString() + " &");
+					stringBuilder.append(discipline.getAsJsonObject().get("name").getAsString() + " &");
+					stringBuilder.append(discipline.getAsJsonObject().get("period").getAsString() + " &");
+					stringBuilder.append(DISCIPLINE_STATE.get(discipline.getAsJsonObject().get("state").getAsString()) + " &");
+					stringBuilder.append(discipline.getAsJsonObject().get("grade").getAsString() + " &");
+					stringBuilder.append(discipline.getAsJsonObject().get("frequency").getAsString() + "\\% &");
+					stringBuilder.append(discipline.getAsJsonObject().get("absenses").getAsString() + " &");
+					stringBuilder.append(entry.getAsJsonObject().get("observation").getAsString() + " \\\\");
+				}
+				notifyObserver(chatId, Report.generateReport(stringBuilder.toString()), false, false, true);
+
+			} catch (IOException e) {
+				notifyObserver(chatId, "Não consegui recuperar as informações =(", false, false, false);
+			}
+
+		} else {
+			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registrar para fazer o cadastro",
+					false, false, false);
 		}
 	}
 
@@ -159,15 +204,15 @@ public class Model implements Subject {
 					}
 				}
 
-				notifyObserver(chatId, schedulesBuilder.toString(), true, false);
+				notifyObserver(chatId, schedulesBuilder.toString(), true, false, false);
 
 			} catch (IOException e) {
-				notifyObserver(chatId, "Não consegui recuperar as informações =(", false, false);
+				notifyObserver(chatId, "Não consegui recuperar as informações =(", false, false, false);
 			}
 
 		} else {
 			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registrar para fazer o cadastro",
-					false, false);
+					false, false, false);
 		}
 	}
 
@@ -175,9 +220,9 @@ public class Model implements Subject {
 		observers.add(observer);
 	}
 
-	public void notifyObserver(long chatId, String message, boolean keyBoard, boolean replyMessage) {
+	public void notifyObserver(long chatId, Object message, boolean keyBoard, boolean replyMessage, boolean isDocument) {
 		for (Observer observer : observers) {
-			observer.update(chatId, message, keyBoard, replyMessage);
+			observer.update(chatId, message, keyBoard, replyMessage, isDocument);
 		}
 	}
 }

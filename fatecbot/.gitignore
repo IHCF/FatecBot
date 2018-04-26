@@ -1,2 +1,7 @@
 /.metadata/
 /target/
+/*.aux
+/*.log
+/*.pdf
+/*.synctex.gz
+/*.tex
