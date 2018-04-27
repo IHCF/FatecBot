@@ -104,35 +104,31 @@ public class Model implements Subject {
 		notifyObserver(chatId, "Usuário revogado com sucesso! \uD83D\uDD35", false, false, false);
 	}
 
-	public void getAbsenses(Long chatId) {
+	public void getAbsenses(Long chatId) throws IOException {
 		Student student = recoveryUser(chatId, false);
 
 		if (student != null) {
+			// Cria tipo para serializar o json em um List
+			Type listType = new TypeToken<ArrayList<Discipline>>() {
+			}.getType();
+
+			// Realiza a recuperação dos dados
+			JsonElement element = api.sendPost(student.getSigaId(), student.getPasswordSiga());
+
+			// Transforma o JSON em List<Discipline>
+			List<Discipline> disciplines = new Gson()
+					.fromJson(element.getAsJsonObject().get("disciplines").getAsJsonArray(), listType);
+
 			StringBuilder absensesBuilder = new StringBuilder();
 			absensesBuilder.append("Suas faltas: \n");
-			try {
-				// Recupera as informações da API
-				JsonElement absenses = api.sendPost(student.getSigaId(), student.getPasswordSiga());
-
-				for (JsonElement element : absenses.getAsJsonObject().get("disciplines").getAsJsonArray()) {
-					absensesBuilder.append("Matéria: " + element.getAsJsonObject().get("name") + "\n");
-					absensesBuilder.append("Professor(a): " + element.getAsJsonObject().get("teacherName") + "\n");
-					absensesBuilder.append("Quantidade de faltas: " + element.getAsJsonObject().get("absenses") + "\n");
-					absensesBuilder.append("- - - - - - - - - - - -\n");
-				}
-
-			} catch (IOException e) {
-				// Caso a API não consiga entregar informações do usuário
-				notifyObserver(chatId,
-						"Acho que não consegui recuperar suas informações =(. Se precisar utilize /registrar novamente!",
-						false, false, false);
+			for (Discipline discipline : disciplines) {
+				absensesBuilder.append("Matéria: " + discipline.getName() + "\n");
+				absensesBuilder.append("Professor(a): " + discipline.getTeacherName() + "\n");
+				absensesBuilder.append("Quantidade de faltas: " + discipline.getAbsenses() + "\n");
+				absensesBuilder.append("- - - - - - - - - - - -\n");
 			}
 
 			notifyObserver(chatId, absensesBuilder.toString(), true, false, false);
-
-		} else {
-			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registrar para fazer o cadastro",
-					false, false, false);
 		}
 	}
 
@@ -176,7 +172,7 @@ public class Model implements Subject {
 		if (student != null) {
 			JsonElement element = api.sendPost(student.getSigaId(), student.getPasswordSiga());
 
-			// Cria tipo para serializar o json em um List
+			// Cria tipo para serializar o json em List
 			Type listType = new TypeToken<ArrayList<Schedule>>() {
 			}.getType();
 

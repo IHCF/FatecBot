@@ -1,5 +1,7 @@
 package controller;
 
+import java.io.IOException;
+
 import com.pengrad.telegrambot.model.Update;
 
 import model.Model;
@@ -17,6 +19,11 @@ public class AbsenceController implements ProcessController {
 
 	public void process(Update update) {
 		view.sendTypingMessage(update);
-		model.getAbsenses(update.message().chat().id());
+		try {
+			model.getAbsenses(update.message().chat().id());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

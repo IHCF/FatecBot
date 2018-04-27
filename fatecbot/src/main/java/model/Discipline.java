@@ -13,7 +13,6 @@ public class Discipline {
 	private String teacherName;
 	private int teacherId;
 	
-	
 
 	public int getAbsenses() {
 		return absenses;
