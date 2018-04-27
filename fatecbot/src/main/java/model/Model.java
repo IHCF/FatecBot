@@ -1,13 +1,16 @@
 package model;
 
-import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
 
 import view.Observer;
 
@@ -20,16 +23,16 @@ public class Model implements Subject {
 	private static Model uniqueInstance;
 
 	// Cria HashMap com os dias da Semana
-	private static final Map<Integer, String> WEEK_DAY;
-	static {
-		WEEK_DAY = new HashMap<Integer, String>();
-		WEEK_DAY.put(1, "Segunda-feira");
-		WEEK_DAY.put(2, "Terça-feira");
-		WEEK_DAY.put(3, "Quarta-feira");
-		WEEK_DAY.put(4, "Quinta-feira");
-		WEEK_DAY.put(5, "Sexta-feira");
-	}
-	
+	// private static final Map<Integer, String> WEEK_DAY;
+	// static {
+	// WEEK_DAY = new HashMap<Integer, String>();
+	// WEEK_DAY.put(1, "Segunda-feira");
+	// WEEK_DAY.put(2, "Terça-feira");
+	// WEEK_DAY.put(3, "Quarta-feira");
+	// WEEK_DAY.put(4, "Quinta-feira");
+	// WEEK_DAY.put(5, "Sexta-feira");
+	// }
+
 	// Cria HashMap com os estados da disciplina
 	private static final Map<String, String> DISCIPLINE_STATE;
 	static {
@@ -98,7 +101,7 @@ public class Model implements Subject {
 			notifyObserver(chatId, "Eita! Tipo um problema ao tentar remover seu usuário. Tente novamente mais tarde",
 					false, false, false);
 		}
-		notifyObserver(chatId, "Usuário revogado com sucesso!", false, false, false);
+		notifyObserver(chatId, "Usuário revogado com sucesso! \uD83D\uDD35", false, false, false);
 	}
 
 	public void getAbsenses(Long chatId) {
@@ -133,10 +136,9 @@ public class Model implements Subject {
 		}
 	}
 
-
 	public void generateHistory(Long chatId) {
 		Student student = recoveryUser(chatId, false);
-		
+
 		if (student != null) {
 			StringBuilder stringBuilder = new StringBuilder();
 			try {
@@ -149,7 +151,8 @@ public class Model implements Subject {
 					stringBuilder.append(discipline.getAsJsonObject().get("code").getAsString() + " &");
 					stringBuilder.append(discipline.getAsJsonObject().get("name").getAsString() + " &");
 					stringBuilder.append(discipline.getAsJsonObject().get("period").getAsString() + " &");
-					stringBuilder.append(DISCIPLINE_STATE.get(discipline.getAsJsonObject().get("state").getAsString()) + " &");
+					stringBuilder.append(
+							DISCIPLINE_STATE.get(discipline.getAsJsonObject().get("state").getAsString()) + " &");
 					stringBuilder.append(discipline.getAsJsonObject().get("grade").getAsString() + " &");
 					stringBuilder.append(discipline.getAsJsonObject().get("frequency").getAsString() + "\\% &");
 					stringBuilder.append(discipline.getAsJsonObject().get("absenses").getAsString() + " &");
@@ -167,50 +170,42 @@ public class Model implements Subject {
 		}
 	}
 
-	public void getSchedules(Long chatId) {
+	public void getSchedules(Long chatId) throws IOException {
 		Student student = recoveryUser(chatId, false);
 
 		if (student != null) {
+			JsonElement element = api.sendPost(student.getSigaId(), student.getPasswordSiga());
+
+			// Cria tipo para serializar o json em um List
+			Type listType = new TypeToken<ArrayList<Schedule>>() {
+			}.getType();
+
+			// Transforma o json em objeto
+			List<Schedule> schedules = new Gson().fromJson(element.getAsJsonObject().get("schedules").getAsJsonArray(),
+					listType);
+
 			StringBuilder schedulesBuilder = new StringBuilder();
 			schedulesBuilder.append("Suas aulas\n");
-			try {
-				// Recupera as informações da API
-				JsonElement schedules = api.sendPost(student.getSigaId(), student.getPasswordSiga());
 
-				for (JsonElement element : schedules.getAsJsonObject().get("schedules").getAsJsonArray()) {
+			for (Schedule schedule : schedules) {
+				schedulesBuilder.append("Dia da semana: " + schedule.getWeekday() + "\n");
+				for (Period period : schedule.getPeriods()) {
 
-					String diaDaSemana = WEEK_DAY.get(element.getAsJsonObject().get("weekday").getAsInt());
+					// Tratando String para que seja exibido apenas as horas
+					String startAt = period.getStartAt().split("T")[1];
+					startAt = startAt.substring(0, startAt.length() - 5);
 
-					// Verificação por conta do retorno da API, que no último valor retornado
-					// entrega null.
-					if (diaDaSemana != null) {
-						schedulesBuilder.append("Dia da semana: " + diaDaSemana + "\n");
+					String endAt = period.getEndAt().split("T")[1];
+					endAt = endAt.substring(0, endAt.length() - 5);
 
-						for (JsonElement periodElement : element.getAsJsonObject().get("periods").getAsJsonArray()) {
-							JsonElement discipline = periodElement.getAsJsonObject().get("discipline");
-
-							schedulesBuilder.append("\nMatéria: " + discipline.getAsJsonObject().get("code") + "\n");
-
-							// Trata a string do horário de inicio, devolvendo apenas a hora
-							String[] horarioInicio = periodElement.getAsJsonObject().get("startAt").toString()
-									.split("T");
-							schedulesBuilder.append("Horário de inicio: "
-									+ horarioInicio[1].substring(0, horarioInicio[1].length() - 5) + "\n");
-
-							// Trata a string do horário de fim, devolvendo apenas a hora
-							String[] horarioFim = periodElement.getAsJsonObject().get("endAt").toString().split("T");
-							schedulesBuilder.append("Horário de término: "
-									+ horarioFim[1].substring(0, horarioFim[1].length() - 5) + "\n");
-						}
-						schedulesBuilder.append("- - - - - - - - - - - -\n");
-					}
+					schedulesBuilder.append("Matéria: " + period.getDiscipline().getCode() + "\n");
+					schedulesBuilder.append("Horário de inicio: " + startAt + "\n");
+					schedulesBuilder.append("Horário de fim: " + endAt + "\n\n");
 				}
-
-				notifyObserver(chatId, schedulesBuilder.toString(), true, false, false);
-
-			} catch (IOException e) {
-				notifyObserver(chatId, "Não consegui recuperar as informações =(", false, false, false);
+				schedulesBuilder.append("- - - - - - - - - - - -\n");
 			}
+
+			notifyObserver(chatId, schedulesBuilder.toString(), false, false, false);
 
 		} else {
 			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registrar para fazer o cadastro",
@@ -226,7 +221,8 @@ public class Model implements Subject {
 		observers.add(observer);
 	}
 
-	public void notifyObserver(long chatId, Object message, boolean keyBoard, boolean replyMessage, boolean isDocument) {
+	public void notifyObserver(long chatId, Object message, boolean keyBoard, boolean replyMessage,
+			boolean isDocument) {
 		for (Observer observer : observers) {
 			observer.update(chatId, message, keyBoard, replyMessage, isDocument);
 		}

@@ -63,7 +63,6 @@ public class View implements Observer {
 		for (Update update : updates) {
 
 			if (state == State.IS_NOTHING.getState()) {
-
 				if (update.message().text().equals("/start")) {
 					update(update.message().chat().id(),
 							"Olá, seja bem-vindo ao FatecBot, assistente simples e fácil de utilizar,"
@@ -84,29 +83,29 @@ public class View implements Observer {
 					setController(new AuthController(model, this));
 				}
 
-				else if (update.message().text().equals("Ver faltas")) {
+				else if (update.message().text().equals("Ver faltas 🔥")) {
 					setController(new AbsenceController(model, this));
 				}
 
-				else if (update.message().text().equals("Ver horário")) {
+				else if (update.message().text().equals("Ver horário 🕐")) {
 					setController(new SchedulesController(model, this));
 				}
 
-				else if (update.message().text().equals("Configurações")) {
+				else if (update.message().text().equals("Configurações 🔧")) {
 					update(update.message().chat().id(),
-							"As opções de configuração disponíveis são as seguintes: \n\n /remove - Comando para revogar acesso do bot aos dados do SIGA", false, false, false);
+							"As opções de configuração disponíveis são as seguintes: \n\n /remove - Comando para revogar acesso do bot aos dados do SIGA",
+							false, false, false);
 				}
 
 				else if (update.message().text().equals("/remove")) {
 					setController(new DeleteController(model, this));
 				}
-				
-				else if (update.message().text().equals("Posso faltar ?")) {
+
+				else if (update.message().text().equals("Posso faltar ? 📊")) {
 					setController(new WantAbsenceController(model, this));
 				}
-				
 
-				else if (update.message().text().equals("Gerar relatório escolar")) {
+				else if (update.message().text().equals("Gerar relatório escolar 📝")) {
 					setController(new HistoryController(model, this));
 				}
 
@@ -130,10 +129,11 @@ public class View implements Observer {
 			bot.execute(new SendMessage(chatId, (String) message).replyMarkup(new ForceReply()));
 		} else if (keyBoard) {
 			bot.execute(new SendMessage(chatId, (String) message).replyMarkup(new ReplyKeyboardMarkup(
-					new KeyboardButton[] { new KeyboardButton("Ver faltas"), new KeyboardButton("Ver horário") },
-					new KeyboardButton[] { new KeyboardButton("Posso faltar ?"),
-							new KeyboardButton("Gerar relatório escolar") },
-					new KeyboardButton[] { new KeyboardButton("Configurações")})));
+					new KeyboardButton[] { new KeyboardButton("Ver faltas \uD83D\uDD25"),
+							new KeyboardButton("Ver horário \uD83D\uDD50") },
+					new KeyboardButton[] { new KeyboardButton("Posso faltar ? \uD83D\uDCCA"),
+							new KeyboardButton("Gerar relatório escolar \uD83D\uDCDD") },
+					new KeyboardButton[] { new KeyboardButton("Configurações \uD83D\uDD27") })));
 		} else if (isDocument) {
 			bot.execute(new SendDocument(chatId, (File) message));
 		} else {

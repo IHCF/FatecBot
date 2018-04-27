@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.text.ParseException;
 
 import model.Model;
-import model.Report;
 import model.ToolBox;
 import view.View;
 
@@ -14,7 +13,7 @@ public class App {
 
 		String telegramKey = null;
 		Model model = Model.getInstance();
-		
+
 		try {
 			telegramKey = ToolBox.loadTelegramKey();
 		} catch (FileNotFoundException e) {

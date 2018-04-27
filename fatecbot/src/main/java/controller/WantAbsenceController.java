@@ -15,7 +15,6 @@ public class WantAbsenceController implements ProcessController {
 		this.view = view;
 	}
 
-	@Override
 	public void process(Update update) {
 		view.sendTypingMessage(update);
 		model.wantAbsence(update.message().chat().id());
