@@ -3,10 +3,8 @@ package model;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -21,27 +19,6 @@ public class Model implements Subject {
 	private List<Observer> observers = new LinkedList<Observer>();
 
 	private static Model uniqueInstance;
-
-	// Cria HashMap com os dias da Semana
-	// private static final Map<Integer, String> WEEK_DAY;
-	// static {
-	// WEEK_DAY = new HashMap<Integer, String>();
-	// WEEK_DAY.put(1, "Segunda-feira");
-	// WEEK_DAY.put(2, "Terça-feira");
-	// WEEK_DAY.put(3, "Quarta-feira");
-	// WEEK_DAY.put(4, "Quinta-feira");
-	// WEEK_DAY.put(5, "Sexta-feira");
-	// }
-
-	// Cria HashMap com os estados da disciplina
-	private static final Map<String, String> DISCIPLINE_STATE;
-	static {
-		DISCIPLINE_STATE = new HashMap<String, String>();
-		DISCIPLINE_STATE.put("approved", "Aprovado");
-		DISCIPLINE_STATE.put("attending", "Em Curso");
-		DISCIPLINE_STATE.put("not-attended", "Não cursado");
-		DISCIPLINE_STATE.put("dismissed", "Dispensado");
-	}
 
 	// Tornando a classe Singleton.
 	public static Model getInstance() {
@@ -104,31 +81,37 @@ public class Model implements Subject {
 		notifyObserver(chatId, "Usuário revogado com sucesso! \uD83D\uDD35", false, false, false);
 	}
 
-	public void getAbsenses(Long chatId) throws IOException {
+	public void getAbsenses(Long chatId) {
 		Student student = recoveryUser(chatId, false);
 
 		if (student != null) {
-			// Cria tipo para serializar o json em um List
-			Type listType = new TypeToken<ArrayList<Discipline>>() {
-			}.getType();
 
-			// Realiza a recuperação dos dados
-			JsonElement element = api.sendPost(student.getSigaId(), student.getPasswordSiga());
+			try {
+				// Cria tipo para deserializar o json em um List
+				Type listType = new TypeToken<ArrayList<Discipline>>() {
+				}.getType();
 
-			// Transforma o JSON em List<Discipline>
-			List<Discipline> disciplines = new Gson()
-					.fromJson(element.getAsJsonObject().get("disciplines").getAsJsonArray(), listType);
+				// Realiza a recuperação dos dados
+				JsonElement element = api.sendPost(student.getSigaId(), student.getPasswordSiga());
 
-			StringBuilder absensesBuilder = new StringBuilder();
-			absensesBuilder.append("Suas faltas: \n");
-			for (Discipline discipline : disciplines) {
-				absensesBuilder.append("Matéria: " + discipline.getName() + "\n");
-				absensesBuilder.append("Professor(a): " + discipline.getTeacherName() + "\n");
-				absensesBuilder.append("Quantidade de faltas: " + discipline.getAbsenses() + "\n");
-				absensesBuilder.append("- - - - - - - - - - - -\n");
+				// Transforma o JSON em List<Discipline>
+				List<Discipline> disciplines = new Gson()
+						.fromJson(element.getAsJsonObject().get("disciplines").getAsJsonArray(), listType);
+
+				StringBuilder absensesBuilder = new StringBuilder();
+				absensesBuilder.append("Suas faltas: \n");
+				for (Discipline discipline : disciplines) {
+					absensesBuilder.append("Matéria: " + discipline.getName() + "\n");
+					absensesBuilder.append("Professor(a): " + discipline.getTeacherName() + "\n");
+					absensesBuilder.append("Quantidade de faltas: " + discipline.getAbsenses() + "\n");
+					absensesBuilder.append("- - - - - - - - - - - -\n");
+				}
+
+				notifyObserver(chatId, absensesBuilder.toString(), true, false, false);
+			} catch (Exception e) {
+				notifyObserver(chatId, "Eita, tive alguns problemas para acessar seus dados. Tente mais tarde", true,
+						false, false);
 			}
-
-			notifyObserver(chatId, absensesBuilder.toString(), true, false, false);
 		}
 	}
 
@@ -136,28 +119,39 @@ public class Model implements Subject {
 		Student student = recoveryUser(chatId, false);
 
 		if (student != null) {
-			StringBuilder stringBuilder = new StringBuilder();
+
+			// Cria tipo para deserializar o json em um List
+			Type listType = new TypeToken<ArrayList<Entry>>() {
+			}.getType();
+
+			// Realiza a recuperação dos dados
+			JsonElement element;
 			try {
-				// Recupera as informações da API
-				JsonElement response = api.sendPost(student.getSigaId(), student.getPasswordSiga());
-				JsonElement history = response.getAsJsonObject().get("history");
+				element = api.sendPost(student.getSigaId(), student.getPasswordSiga());
 
-				for (JsonElement entry : history.getAsJsonObject().get("entries").getAsJsonArray()) {
-					JsonElement discipline = entry.getAsJsonObject().get("discipline");
-					stringBuilder.append(discipline.getAsJsonObject().get("code").getAsString() + " &");
-					stringBuilder.append(discipline.getAsJsonObject().get("name").getAsString() + " &");
-					stringBuilder.append(discipline.getAsJsonObject().get("period").getAsString() + " &");
-					stringBuilder.append(
-							DISCIPLINE_STATE.get(discipline.getAsJsonObject().get("state").getAsString()) + " &");
-					stringBuilder.append(discipline.getAsJsonObject().get("grade").getAsString() + " &");
-					stringBuilder.append(discipline.getAsJsonObject().get("frequency").getAsString() + "\\% &");
-					stringBuilder.append(discipline.getAsJsonObject().get("absenses").getAsString() + " &");
-					stringBuilder.append(entry.getAsJsonObject().get("observation").getAsString() + " \\\\");
+				// Transforma o JSON em List<Discipline>
+				List<Entry> history = new Gson().fromJson(
+						element.getAsJsonObject().get("history").getAsJsonObject().get("entries").getAsJsonArray(),
+						listType);
+
+				StringBuilder stringBuilder = new StringBuilder();
+				for (Entry entry : history) {
+					Discipline discipline = entry.getDiscipline();
+
+					stringBuilder.append(discipline.getCode() + " &");
+					stringBuilder.append(discipline.getName() + " &");
+					stringBuilder.append(discipline.getPeriod() + " &");
+					stringBuilder.append(discipline.getState() + " &");
+					stringBuilder.append(discipline.getGrade() + " &");
+					stringBuilder.append(discipline.getFrequency() + "\\% &");
+					stringBuilder.append(discipline.getAbsenses() + " &");
+					stringBuilder.append(entry.getObservation() + " \\\\");
 				}
-				notifyObserver(chatId, Report.generateReport(stringBuilder.toString()), false, false, true);
 
+				notifyObserver(chatId, Report.generateReport(stringBuilder.toString()), false, false, true);
 			} catch (IOException e) {
-				notifyObserver(chatId, "Não consegui recuperar as informações =(", false, false, false);
+				notifyObserver(chatId, "Não consegui recuperar as informações =(. Tente mais tarde", false, false,
+						false);
 			}
 
 		} else {
@@ -166,42 +160,46 @@ public class Model implements Subject {
 		}
 	}
 
-	public void getSchedules(Long chatId) throws IOException {
+	public void getSchedules(Long chatId) {
 		Student student = recoveryUser(chatId, false);
 
 		if (student != null) {
-			JsonElement element = api.sendPost(student.getSigaId(), student.getPasswordSiga());
 
-			// Cria tipo para serializar o json em List
-			Type listType = new TypeToken<ArrayList<Schedule>>() {
-			}.getType();
+			try {
+				JsonElement element = api.sendPost(student.getSigaId(), student.getPasswordSiga());
 
-			// Transforma o json em objeto
-			List<Schedule> schedules = new Gson().fromJson(element.getAsJsonObject().get("schedules").getAsJsonArray(),
-					listType);
+				// Cria tipo para deserializar o json em List
+				Type listType = new TypeToken<ArrayList<Schedule>>() {
+				}.getType();
 
-			StringBuilder schedulesBuilder = new StringBuilder();
-			schedulesBuilder.append("Suas aulas\n");
+				// Transforma o json em objeto
+				List<Schedule> schedules = new Gson()
+						.fromJson(element.getAsJsonObject().get("schedules").getAsJsonArray(), listType);
 
-			for (Schedule schedule : schedules) {
-				schedulesBuilder.append("Dia da semana: " + schedule.getWeekday() + "\n");
-				for (Period period : schedule.getPeriods()) {
+				StringBuilder schedulesBuilder = new StringBuilder();
+				schedulesBuilder.append("Suas aulas\n");
 
-					// Tratando String para que seja exibido apenas as horas
-					String startAt = period.getStartAt().split("T")[1];
-					startAt = startAt.substring(0, startAt.length() - 5);
+				for (Schedule schedule : schedules) {
+					schedulesBuilder.append("Dia da semana: " + schedule.getWeekday() + "\n");
+					for (Period period : schedule.getPeriods()) {
 
-					String endAt = period.getEndAt().split("T")[1];
-					endAt = endAt.substring(0, endAt.length() - 5);
+						// Tratando String para que seja exibido apenas as horas
+						String startAt = period.getStartAt().split("T")[1];
+						startAt = startAt.substring(0, startAt.length() - 5);
 
-					schedulesBuilder.append("Matéria: " + period.getDiscipline().getCode() + "\n");
-					schedulesBuilder.append("Horário de inicio: " + startAt + "\n");
-					schedulesBuilder.append("Horário de fim: " + endAt + "\n\n");
+						String endAt = period.getEndAt().split("T")[1];
+						endAt = endAt.substring(0, endAt.length() - 5);
+
+						schedulesBuilder.append("Matéria: " + period.getDiscipline().getCode() + "\n");
+						schedulesBuilder.append("Horário de inicio: " + startAt + "\n");
+						schedulesBuilder.append("Horário de fim: " + endAt + "\n\n");
+					}
+					schedulesBuilder.append("- - - - - - - - - - - -\n");
 				}
-				schedulesBuilder.append("- - - - - - - - - - - -\n");
+				notifyObserver(chatId, schedulesBuilder.toString(), false, false, false);
+			} catch (Exception e) {
+				notifyObserver(chatId, "Opa! Não consegui realizar a operação. Tente mais tarde.", false, false, false);
 			}
-
-			notifyObserver(chatId, schedulesBuilder.toString(), false, false, false);
 
 		} else {
 			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registrar para fazer o cadastro",
@@ -210,6 +208,90 @@ public class Model implements Subject {
 	}
 
 	public void wantAbsence(Long chatId) {
+
+		Student student = recoveryUser(chatId, false);
+
+		if (student != null) {
+			try {
+
+				// Lista que irá armazenar as disciplinar do dia
+				List<Discipline> disciplinesInCourse = new ArrayList<>();
+
+				// Cria tipo para deserializar o json em um List
+				Type listEntry = new TypeToken<ArrayList<Entry>>() {
+				}.getType();
+				Type listSchedule = new TypeToken<ArrayList<Schedule>>() {
+				}.getType();
+
+				// Realiza a recuperação dos dados
+				JsonElement element = api.sendPost(student.getSigaId(), student.getPasswordSiga());
+
+				// Transforma o JSON em List<Discipline>
+				List<Entry> history = new Gson().fromJson(
+						element.getAsJsonObject().get("history").getAsJsonObject().get("entries").getAsJsonArray(),
+						listEntry);
+				List<Schedule> schedules = new Gson()
+						.fromJson(element.getAsJsonObject().get("schedules").getAsJsonArray(), listSchedule);
+
+				// Recupera a temperatura atual
+				Forecast forecastToday = fSearch.getForecast().getPrevisao().get(0);
+				// Recupera o dia atual
+				int dayOfWeek = ToolBox.getDayWeek();
+
+				List<Period> disciplinesDay = schedules.get(dayOfWeek - 1).getPeriods();
+
+				// Busca as matérias do dia, e verifica quais o aluno está cursando
+				for (Entry entry : history) {
+					for (Period period : disciplinesDay) {
+						if (period.getDiscipline().getCode().equals(entry.getDiscipline().getCode())) {
+							if (entry.getDiscipline().getState().equals("Em Curso")) {
+								disciplinesInCourse.add(entry.getDiscipline());
+							}
+						}
+					}
+				}
+
+				boolean isAbsense = true; // Flag para indicar que o aluno pode faltar
+				// Verificando as faltas das matérias em que o aluno está matriculado
+				// Caso ele tenha mais que seis faltas em qualque matéria, o bot recomenda ele
+				// não faltar, como um incentivo!
+				for (Discipline discipline : disciplinesInCourse) {
+					if (discipline.getAbsenses() >= 6) {
+						isAbsense = false;
+						break;
+					}
+				}
+
+				StringBuilder response = new StringBuilder();
+				if (!isAbsense) {
+					if (forecastToday.isCold()) {
+						response.append("Mesmo frio (");
+					} else if (forecastToday.isHot()) {
+						response.append("Mesmo calor (");
+					} else if (forecastToday.isMild()) {
+						response.append("Mesmo com o clima ameno, bom para ficar sem fazer nada (");
+					}
+					response.append(forecastToday.getMinima());
+					response.append("°), você precisa ir para a faculdade, está com muitas faltas");
+				} else {
+					if (forecastToday.isCold()) {
+						response.append("Está frio (");
+					} else if (forecastToday.isHot()) {
+						response.append("Está calor (");
+					} else if (forecastToday.isMild()) {
+						response.append("O clima está ameno, (");
+					}
+					response.append(forecastToday.getMaxima());
+					response.append("°), nem vai para faculdade, suas faltas estão tranquilas");
+				}
+				notifyObserver(chatId, response.toString(), false, false, false);
+			} catch (Exception e) {
+				notifyObserver(chatId, "Acho que hoje não é dia de se fazer esta pergunta", false, false, false);
+			}
+		} else {
+			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registrar para fazer o cadastro",
+					false, false, false);
+		}
 
 	}
 

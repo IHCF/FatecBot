@@ -47,4 +47,25 @@ public class Forecast {
 		this.minima = minima;
 	}
 
+	public boolean isCold() {
+		boolean response = false;
+		if (minima <= 15 && maxima <= 23)
+			response = true;
+		return response;
+	}
+
+	public boolean isMild() {
+		boolean response = false;
+		if (minima <= 23 && maxima < 28)
+			response = true;
+		return response;
+	}
+
+	public boolean isHot() {
+		boolean response = false;
+		if (minima < 25 && maxima > 28)
+			response = true;
+		return response;
+	}
+
 }

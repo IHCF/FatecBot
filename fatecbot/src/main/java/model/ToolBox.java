@@ -4,6 +4,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Properties;
 
 public class ToolBox {
@@ -37,5 +39,12 @@ public class ToolBox {
 		prop.load(input);
 
 		return prop.getProperty("URL_ADDRESS");
+	}
+
+	public static int getDayWeek() {
+		Calendar c = Calendar.getInstance();
+		c.setTime(new Date());
+		
+		return c.get(Calendar.DAY_OF_WEEK);
 	}
 }

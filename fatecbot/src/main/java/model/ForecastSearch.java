@@ -62,7 +62,7 @@ public class ForecastSearch implements Information {
 		unmarshaller = jaxbContext.createUnmarshaller();
 		StringReader reader = new StringReader(responseBuffer.toString());
 		ForecastCity city = (ForecastCity) unmarshaller.unmarshal(reader);
-	
+
 		return city;
 	}
 }
