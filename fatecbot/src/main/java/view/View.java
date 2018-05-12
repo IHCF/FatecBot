@@ -11,11 +11,12 @@ import com.pengrad.telegrambot.model.request.ForceReply;
 import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendChatAction;
-import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendDocument;
+import com.pengrad.telegrambot.request.SendMessage;
 
 import controller.AbsenceController;
 import controller.AuthController;
+import controller.DatabaseController;
 import controller.DeleteController;
 import controller.HistoryController;
 import controller.ProcessController;
@@ -99,6 +100,11 @@ public class View implements Observer {
 
 				else if (update.message().text().equals("/remove")) {
 					setController(new DeleteController(model, this));
+				}
+
+				else if (update.message().text().contains("/change_databases_")) {
+					System.out.println("Troca BD");
+					setController(new DatabaseController(model, this));
 				}
 
 				else if (update.message().text().equals("Posso faltar ? 📊")) {

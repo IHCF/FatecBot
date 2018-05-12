@@ -4,11 +4,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Properties;
 
-public class ToolBox {
+public class PropertiesUtils {
 
 	public static String loadTelegramKey() throws FileNotFoundException, IOException {
 
@@ -18,6 +16,16 @@ public class ToolBox {
 		prop.load(input);
 
 		return prop.getProperty("TELEGRAM_TOKEN");
+	}
+
+	public static String loadAdminKey() throws IOException {
+
+		Properties prop = new Properties();
+		InputStream input = new FileInputStream("src/main/resources/telegram.properties");
+
+		prop.load(input);
+
+		return prop.getProperty("ADMIN_ID");
 	}
 
 	public static String[] loadDataBaseConfigures() throws FileNotFoundException, IOException {
@@ -41,10 +49,18 @@ public class ToolBox {
 		return prop.getProperty("URL_ADDRESS");
 	}
 
-	public static int getDayWeek() {
-		Calendar c = Calendar.getInstance();
-		c.setTime(new Date());
-		
-		return c.get(Calendar.DAY_OF_WEEK);
+	public static String[] loadForecastApiInfos() throws IOException {
+
+		String[] props = new String[2];
+		Properties prop = new Properties();
+		InputStream input = new FileInputStream("src/main/resources/api.properties");
+
+		prop.load(input);
+
+		props[0] = prop.getProperty("INPE_API_FORECAST").replace("%22", "");
+		props[1] = prop.getProperty("INPE_API_FORECAST_PATH").replace("%22", "");
+
+		return props;
 	}
+
 }
