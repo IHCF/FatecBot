@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "cidade")
-public class ForecastCity implements Information {
+public class ForecastCity {
 
 	private String nome;
 	private String uf;

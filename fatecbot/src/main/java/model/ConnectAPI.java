@@ -24,7 +24,7 @@ public class ConnectAPI implements NetworkOperations {
 
 	public JsonArray sendGet() throws FileNotFoundException, IOException {
 
-		String url = ToolBox.loadApiKey();
+		String url = PropertiesUtils.loadApiKey();
 
 		URL urlObj = new URL(url);
 		HttpsURLConnection conn = (HttpsURLConnection) urlObj.openConnection();
@@ -54,7 +54,7 @@ public class ConnectAPI implements NetworkOperations {
 		final MediaType jsonMediaType = MediaType.parse("application/json");
 
 		JsonObject jsonObject = new JsonObject();
-		String url = ToolBox.loadApiKey();
+		String url = PropertiesUtils.loadApiKey();
 		jsonObject.addProperty("login", login);
 		jsonObject.addProperty("password", password);
 

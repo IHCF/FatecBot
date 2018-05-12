@@ -18,10 +18,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @XmlRootElement(name = "cidades")
-public class ForecastSearch implements Information {
+public class ForecastSearch {
 
 	private List<ForecastCity> listCity;
-	private BufferedReader parse;
 	private final static String USER_AGENT = "Mozilla/50.0";
 
 	public List<ForecastCity> getCidade() {
@@ -33,18 +32,29 @@ public class ForecastSearch implements Information {
 		this.listCity = listCity;
 	}
 
-	private URL builtUrlCidade() throws MalformedURLException {
-		return new URL(UriComponentsBuilder.newInstance().scheme(PROTOCOL).host(INPE_API_FORECAST)
-				.path(INPE_API_FORECAST_PATH).toUriString());
+	private URL builtUrlCidade() throws IOException {
+
+		String[] apiInfos = PropertiesUtils.loadForecastApiInfos();
+
+		return new URL(UriComponentsBuilder.newInstance().scheme("http").host(apiInfos[0]).path(apiInfos[1])
+				.toUriString().replaceAll("%22", ""));
 	}
 
+	/**
+	 * Método que realiza a busca da previsão do tempo.
+	 * 
+	 * @return
+	 * @throws MalformedURLException
+	 * @throws JAXBException
+	 * @throws IOException
+	 */
 	public ForecastCity getForecast() throws MalformedURLException, JAXBException, IOException {
 
 		// Cria a URL que será utilizada
 		URL url = builtUrlCidade();
 		JAXBContext jaxbContext;
 		Unmarshaller unmarshaller;
-		parse = null;
+		BufferedReader parse = null;
 		StringBuffer responseBuffer = new StringBuffer();
 
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();

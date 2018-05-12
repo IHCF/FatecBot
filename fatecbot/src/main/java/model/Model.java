@@ -2,6 +2,7 @@ package model;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +16,7 @@ import view.Observer;
 public class Model implements Subject {
 
 	private ConnectAPI api = new ConnectAPI();
+	private ModelDAO database = new DatabaseFourObject();
 	private ForecastSearch fSearch = new ForecastSearch();
 	private List<Observer> observers = new LinkedList<Observer>();
 
@@ -32,21 +34,25 @@ public class Model implements Subject {
 
 		String message = "";
 		boolean keyboard = false;
-		try {
-			ModelDAO.createStudent(chatId, nick, sigaId, password);
-			message = "Usuário cadastrado com sucesso. Utilize os botões para se comunicar comigo";
-			keyboard = true;
-		} catch (Exception e) {
-			message = "Ops! Acho que você já está cadastrado! Utilize o /recuperar, assim consigo recuperar suas informações e continuar te ajudando.";
-		}
 
+		boolean created;
+		try {
+			created = database.createStudent(new Student(chatId, nick, sigaId, password));
+			if (created)
+				message = "Usuário cadastrado com sucesso. Utilize os botões para se comunicar comigo";
+			else
+				message = "Ops! Acho que você já está cadastrado! Utilize o /recuperar, assim consigo recuperar suas informações e continuar te ajudando.";
+			keyboard = true;
+		} catch (SQLException | IOException e) {
+			e.printStackTrace();
+		}
 		notifyObserver(chatId, message, keyboard, false, false);
 	}
 
 	public Student recoveryUser(Long chatId, boolean login) {
 
 		try {
-			Student student = ModelDAO.selectStudent(chatId);
+			Student student = database.selectStudent(chatId);
 
 			// Caso seja login e algum usuário tenha sido encontrado
 			if (student != null && login) {
@@ -73,7 +79,7 @@ public class Model implements Subject {
 
 	public void removeUser(Long chatId) {
 		try {
-			ModelDAO.deleteStudent(chatId);
+			database.deleteStudent(chatId);
 		} catch (Exception e) {
 			notifyObserver(chatId, "Eita! Tipo um problema ao tentar remover seu usuário. Tente novamente mais tarde",
 					false, false, false);
@@ -236,7 +242,7 @@ public class Model implements Subject {
 				// Recupera a temperatura atual
 				Forecast forecastToday = fSearch.getForecast().getPrevisao().get(0);
 				// Recupera o dia atual
-				int dayOfWeek = ToolBox.getDayWeek();
+				int dayOfWeek = ModelUtils.getDayWeek();
 
 				List<Period> disciplinesDay = schedules.get(dayOfWeek - 1).getPeriods();
 
@@ -286,6 +292,7 @@ public class Model implements Subject {
 				}
 				notifyObserver(chatId, response.toString(), false, false, false);
 			} catch (Exception e) {
+				e.printStackTrace();
 				notifyObserver(chatId, "Acho que hoje não é dia de se fazer esta pergunta", false, false, false);
 			}
 		} else {
@@ -293,6 +300,10 @@ public class Model implements Subject {
 					false, false, false);
 		}
 
+	}
+
+	public void setDatabase(ModelDAO database) {
+		this.database = database;
 	}
 
 	public void registerObserver(Observer observer) {

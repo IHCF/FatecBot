@@ -28,7 +28,6 @@
 			<version>3.6.0</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
@@ -47,19 +46,19 @@
 			<version>9.1-901-1.jdbc4</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.11</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 			<version>4.3.14.RELEASE</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.db40.db</groupId>
+			<artifactId>db0</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/db4o-8.0.249.16098-all-java5.jar</systemPath>
+		</dependency>
 	</dependencies>
 
 </project>
