@@ -67,6 +67,7 @@ public class DatabaseFourObject implements ModelDAO {
 			if (student.getChatId().equals(chatId)) {
 				students.delete(student);
 				state = true;
+				students.commit();
 			}
 		}
 		return state;

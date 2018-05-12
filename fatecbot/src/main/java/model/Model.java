@@ -240,7 +240,7 @@ public class Model implements Subject {
 						.fromJson(element.getAsJsonObject().get("schedules").getAsJsonArray(), listSchedule);
 
 				// Recupera a temperatura atual
-				Forecast forecastToday = fSearch.getForecast().getPrevisao().get(0);
+				Forecast forecastToday = fSearch.getForecast().first();
 				// Recupera o dia atual
 				int dayOfWeek = ModelUtils.getDayWeek();
 
@@ -277,7 +277,7 @@ public class Model implements Subject {
 					} else if (forecastToday.isMild()) {
 						response.append("Mesmo com o clima ameno, bom para ficar sem fazer nada (");
 					}
-					response.append(forecastToday.getMinima());
+					response.append(forecastToday.getMinimum());
 					response.append("°), você precisa ir para a faculdade, está com muitas faltas");
 				} else {
 					if (forecastToday.isCold()) {
@@ -287,7 +287,7 @@ public class Model implements Subject {
 					} else if (forecastToday.isMild()) {
 						response.append("O clima está ameno, (");
 					}
-					response.append(forecastToday.getMaxima());
+					response.append(forecastToday.getMaximum());
 					response.append("°), nem vai para faculdade, suas faltas estão tranquilas");
 				}
 				notifyObserver(chatId, response.toString(), false, false, false);
