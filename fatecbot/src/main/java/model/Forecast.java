@@ -6,64 +6,64 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "previsao")
 public class Forecast {
 
-	private String dia;
-	private String tempo;
-	private int maxima;
-	private int minima;
+	private String day;
+	private String time;
+	private int maximum;
+	private int minimum;
 
-	public String getDia() {
-		return dia;
+	public String getDay() {
+		return day;
 	}
 
-	@XmlElement
-	public void setDia(String dia) {
-		this.dia = dia;
+	@XmlElement(name = "dia")
+	public void setDay(String day) {
+		this.day = day;
 	}
 
-	public String getTempo() {
-		return tempo;
+	public String getTime() {
+		return time;
 	}
 
-	@XmlElement
-	public void setTempo(String tempo) {
-		this.tempo = tempo;
+	@XmlElement(name = "tempo")
+	public void setTime(String time) {
+		this.time = time;
 	}
 
-	public int getMaxima() {
-		return maxima;
+	public int getMaximum() {
+		return maximum;
 	}
 
-	@XmlElement
-	public void setMaxima(int maxima) {
-		this.maxima = maxima;
+	@XmlElement(name = "maxima")
+	public void setMaximum(int maximum) {
+		this.maximum = maximum;
 	}
 
-	public int getMinima() {
-		return minima;
+	public int getMinimum() {
+		return minimum;
 	}
 
-	@XmlElement
-	public void setMinima(int minima) {
-		this.minima = minima;
+	@XmlElement(name = "minima")
+	public void setMinimum(int minimum) {
+		this.minimum = minimum;
 	}
 
 	public boolean isCold() {
 		boolean response = false;
-		if (minima <= 15 && maxima <= 23)
+		if (minimum <= 15 && maximum <= 23)
 			response = true;
 		return response;
 	}
 
 	public boolean isMild() {
 		boolean response = false;
-		if (minima <= 23 && maxima < 28)
+		if (minimum <= 23 && maximum < 28)
 			response = true;
 		return response;
 	}
 
 	public boolean isHot() {
 		boolean response = false;
-		if (minima < 25 && maxima > 28)
+		if (minimum < 25 && maximum > 28)
 			response = true;
 		return response;
 	}
