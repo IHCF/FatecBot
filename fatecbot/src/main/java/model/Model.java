@@ -161,7 +161,7 @@ public class Model implements Subject {
 			}
 
 		} else {
-			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registrar para fazer o cadastro",
+			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registro para fazer o cadastro",
 					false, false, false);
 		}
 	}
@@ -208,7 +208,7 @@ public class Model implements Subject {
 			}
 
 		} else {
-			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registrar para fazer o cadastro",
+			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registro para fazer o cadastro",
 					false, false, false);
 		}
 	}
@@ -219,49 +219,40 @@ public class Model implements Subject {
 
 		if (student != null) {
 			try {
-
-				// Lista que irá armazenar as disciplinar do dia
-				List<Discipline> disciplinesInCourse = new ArrayList<>();
-
 				// Cria tipo para deserializar o json em um List
-				Type listEntry = new TypeToken<ArrayList<Entry>>() {
+				Type listSchedule = new TypeToken<List<Schedule>>() {
 				}.getType();
-				Type listSchedule = new TypeToken<ArrayList<Schedule>>() {
+				Type listDisciplines = new TypeToken<ArrayList<Discipline>>() {
 				}.getType();
 
 				// Realiza a recuperação dos dados
 				JsonElement element = api.sendPost(student.getSigaId(), student.getPasswordSiga());
 
-				// Transforma o JSON em List<Discipline>
-				List<Entry> history = new Gson().fromJson(
-						element.getAsJsonObject().get("history").getAsJsonObject().get("entries").getAsJsonArray(),
-						listEntry);
+				// Transforma o JSON em List<Entry>
 				List<Schedule> schedules = new Gson()
 						.fromJson(element.getAsJsonObject().get("schedules").getAsJsonArray(), listSchedule);
+				List<Discipline> disciplines = new Gson()
+						.fromJson(element.getAsJsonObject().get("disciplines").getAsJsonArray(), listDisciplines);
+
+				// Recupera o dia atual
+				int dayOfWeek = ModelUtils.getDayWeek() - 2;
+				List<Period> todayClasses = schedules.get(dayOfWeek).getPeriods();
 
 				// Recupera a temperatura atual
 				Forecast forecastToday = fSearch.getForecast().first();
-				// Recupera o dia atual
-				int dayOfWeek = ModelUtils.getDayWeek();
-
-				List<Period> disciplinesDay = schedules.get(dayOfWeek - 1).getPeriods();
-
-				// Busca as matérias do dia, e verifica quais o aluno está cursando
-				for (Entry entry : history) {
-					for (Period period : disciplinesDay) {
-						if (period.getDiscipline().getCode().equals(entry.getDiscipline().getCode())) {
-							if (entry.getDiscipline().getState().equals("Em Curso")) {
-								disciplinesInCourse.add(entry.getDiscipline());
-							}
-						}
-					}
-				}
 
 				boolean isAbsense = true; // Flag para indicar que o aluno pode faltar
 				// Verificando as faltas das matérias em que o aluno está matriculado
 				// Caso ele tenha mais que seis faltas em qualque matéria, o bot recomenda ele
 				// não faltar, como um incentivo!
-				for (Discipline discipline : disciplinesInCourse) {
+				Discipline discipline = null;
+				for (Period period : todayClasses) {
+					for (Discipline d : disciplines) {
+						if (d.getCode().equals(period.getDiscipline().getCode())) {
+							discipline = d;
+							break;
+						}
+					}
 					if (discipline.getAbsenses() >= 6) {
 						isAbsense = false;
 						break;
@@ -278,7 +269,10 @@ public class Model implements Subject {
 						response.append("Mesmo com o clima ameno, bom para ficar sem fazer nada (");
 					}
 					response.append(forecastToday.getMinimum());
-					response.append("°), você precisa ir para a faculdade, está com muitas faltas");
+					response.append("°), você precisa ir para a faculdade, está com muitas faltas\n");
+					response.append("A matéria em que você está com problemas é: ");
+					response.append(discipline.getName());
+					response.append(" (" + discipline.getAbsenses() + "faltas )");
 				} else {
 					if (forecastToday.isCold()) {
 						response.append("Está frio (");
@@ -296,7 +290,7 @@ public class Model implements Subject {
 				notifyObserver(chatId, "Acho que hoje não é dia de se fazer esta pergunta", false, false, false);
 			}
 		} else {
-			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registrar para fazer o cadastro",
+			notifyObserver(chatId, "Seus dados ainda não fora registrados, utilize /registro para fazer o cadastro",
 					false, false, false);
 		}
 

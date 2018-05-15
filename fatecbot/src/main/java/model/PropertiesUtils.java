@@ -14,7 +14,7 @@ public class PropertiesUtils {
 		InputStream input = new FileInputStream("src/main/resources/telegram.properties");
 
 		prop.load(input);
-
+	
 		return prop.getProperty("TELEGRAM_TOKEN");
 	}
 
