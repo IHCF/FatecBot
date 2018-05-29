@@ -1,4 +1,7 @@
-﻿CREATE SEQUENCE aluno_seq;
+﻿-- Modelo físico
+-- Banco de dados: Postgresql
+
+CREATE SEQUENCE aluno_seq;
 
 CREATE TABLE aluno (
     aluno_id INT NOT NULL DEFAULT NEXTVAL ('aluno_seq'),

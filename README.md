@@ -1,4 +1,4 @@
-# FatecBot - Telegram
+# FatecBot - Telegram :rage5:
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3a96b4937e2d47be8da54e26a0a7e8e9)](https://www.codacy.com/app/M3nin0/FatecBot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=IHCF/FatecBot&amp;utm_campaign=Badge_Grade)
 [![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
@@ -51,11 +51,21 @@ Todos esses projetos auxiliam os alunos a ter acesso aos dados do SIGA. Este pro
 ``` Bot ```
 
 
-![Diagrama](https://github.com/IHCF/FatecBot/blob/master/diagramas/class_10.png)
-
+![Diagrama](https://github.com/IHCF/FatecBot/blob/master/diagramas/class_11.png)
 
 
 ``` Banco de dados ```
 
+Este bot pode trabalhar utilizando dois SGBDs diferentes:
+* Database 4 Object;
+* PostgreSQL.
 
-![Banco](diagramas/banco_de_dados.png)
+Abaixo os modelos conceituais e lógico do banco
+
+* Conceitual
+![Conceitual](diagramas/conceitual-db.jpg)
+
+* Lógico
+![Logico](diagramas/logico-db.jpg)
+
+OBS: É importante lembrar que, esta estrutura é valida somente para o PostgreSQL, no caso do Database 4 Object trabalha-se diretamente com os objetos.
