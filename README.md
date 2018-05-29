@@ -1,4 +1,4 @@
-# FatecBot - Telegram :rage5:
+# FatecBot - Telegram
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3a96b4937e2d47be8da54e26a0a7e8e9)](https://www.codacy.com/app/M3nin0/FatecBot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=IHCF/FatecBot&amp;utm_campaign=Badge_Grade)
 [![License](https://img.shields.io/badge/License-BSD%202--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
@@ -63,9 +63,11 @@ Este bot pode trabalhar utilizando dois SGBDs diferentes:
 Abaixo os modelos conceituais e lógico do banco
 
 * Conceitual
+
 ![Conceitual](diagramas/conceitual-db.jpg)
 
 * Lógico
+
 ![Logico](diagramas/logico-db.jpg)
 
 OBS: É importante lembrar que, esta estrutura é valida somente para o PostgreSQL, no caso do Database 4 Object trabalha-se diretamente com os objetos.
