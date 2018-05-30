@@ -39,12 +39,23 @@ Todos esses projetos auxiliam os alunos a ter acesso aos dados do SIGA. Este pro
 
 ``` Verificando faltas ```
 
-![Faltas](imagens_bot/faltas_1.PNG)
+![Faltas](imagens_bot/ver-faltas.gif)
 
 ``` Verificando horários de aula ```
 
-![Horarios](imagens_bot/horarios_1.png)
+![Horários](imagens_bot/ver-horarios.gif)
 
+``` Posso faltar? ```
+
+![Posso faltar?](imagens_bot/posso-faltar.gif)
+
+``` Histórico escolar ```
+
+![Histórico escolar](imagens_bot/historico-escolar.gif)
+
+Ao clicar em `Histórico escolar`, o chatbot gera um [PDF do histórico escolar](imagens_bot/historico-escolar.pdf).
+
+> Esse histórico escolar é gerado pelo bot, não é ferramenta oficial do SIGA da Centro Paula Souza.
 
 ## Diagramas do sistema :clipboard:
 
