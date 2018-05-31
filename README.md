@@ -81,4 +81,13 @@ Abaixo os modelos conceituais e lógico do banco
 
 ![Logico](diagramas/logico-db.jpg)
 
+
 OBS: É importante lembrar que, esta estrutura é valida somente para o PostgreSQL, no caso do Database 4 Object trabalha-se diretamente com os objetos.
+
+Para realizar a troca de banco de dados é necessário definir o `ID do admin` no arquivo `telegram.properties
+`. Ao fazer isto o usuário que receber este privilégio, terá disponível os comandos:
+
+* <code>/change_databases_pg</code> - Troca o banco para PostgreSQL;
+* <code>/change_databases_dbo</code> - Troca o banco para Database4Object.
+
+Veja que o banco padrão da aplicação é o Database4Object.
