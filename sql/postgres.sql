@@ -72,3 +72,22 @@ CREATE TABLE NOTA (
 );
 
 COMMIT;
+
+-- Triggers
+
+-- Criando Trigger para atualizar a data da última atualização sempre que o 'alu_ativo' mudar
+-- Definindo a função que será executada pela Trigger
+CREATE FUNCTION update_date() RETURNS TRIGGER AS $$
+BEGIN
+	UPDATE aluno SET alu_ultima_atualizacao=now() WHERE alu_id = NEW.alu_id;
+	RETURN NEW;
+END; $$
+LANGUAGE plpgsql;
+
+-- Criando a Trigger que fará a execução da função definida anteriormente.
+-- Este é executada sempre depois de uma atualização no alu_ativo.
+CREATE TRIGGER after_update_date
+AFTER UPDATE OF alu_ativo
+	ON aluno
+	FOR EACH ROW 
+	EXECUTE PROCEDURE update_date();
