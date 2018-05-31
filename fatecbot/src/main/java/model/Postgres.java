@@ -17,7 +17,7 @@ public class Postgres implements ModelDAO {
 
 	public boolean createStudent(Student student) throws SQLException, FileNotFoundException, IOException {
 
-		String sql = "INSERT INTO aluno (telegram_code, nome, usuario_siga, senha_siga) VALUES (?, ?, ?, ?)";
+		String sql = "INSERT INTO aluno (alu_telegram_code, alu_nome, alu_usuario_siga, alu_senha_siga) VALUES (?, ?, ?, ?)";
 		Connection conn = Postgres.connect();
 		PreparedStatement ps = conn.prepareStatement(sql);
 
@@ -38,7 +38,7 @@ public class Postgres implements ModelDAO {
 	public Student selectStudent(Long chatId) throws SQLException, FileNotFoundException, IOException {
 
 		Student student = null;
-		String sql = "SELECT usuario_siga, senha_siga FROM aluno WHERE telegram_code = ?";
+		String sql = "SELECT alu_usuario_siga, alu_senha_siga FROM aluno WHERE alu_telegram_code = ?";
 
 		Connection conn = Postgres.connect();
 		PreparedStatement ps = conn.prepareStatement(sql);
@@ -49,8 +49,8 @@ public class Postgres implements ModelDAO {
 		while (rs.next()) {
 			try {
 				// Verifica pois pode ocorrer de não encontrar o usuário
-				if (rs.getString("usuario_siga") != null) {
-					student = new Student(chatId, rs.getString("usuario_siga"), rs.getString("senha_siga"));
+				if (rs.getString("alu_usuario_siga") != null) {
+					student = new Student(chatId, rs.getString("alu_usuario_siga"), rs.getString("alu_senha_siga"));
 				}
 			} catch (Exception e) {
 				return null;
@@ -62,14 +62,14 @@ public class Postgres implements ModelDAO {
 	public boolean deleteStudent(Long chatId) throws SQLException, FileNotFoundException, IOException {
 
 		// Aplicado desta forma para gerar o softdelete
-		String sql = "UPDATE aluno SET ativo = 0 WHERE telegram_code = ?";
+		String sql = "UPDATE aluno SET alu_ativo = 0 WHERE alu_telegram_code = ?";
 
 		Connection conn = Postgres.connect();
 		PreparedStatement ps = conn.prepareStatement(sql);
 		ps.setString(1, Long.toString(chatId));
 
 		ps.executeUpdate();
-
+	
 		return true;
 	}
 }

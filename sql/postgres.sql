@@ -1,66 +1,74 @@
 ﻿-- Modelo físico
 -- Banco de dados: Postgresql
 
-CREATE SEQUENCE aluno_seq;
+CREATE SEQUENCE alu_seq;
 
-CREATE TABLE aluno (
-    aluno_id INT NOT NULL DEFAULT NEXTVAL ('aluno_seq'),
-    telegram_code VARCHAR(120) UNIQUE NOT NULL,
-    nome VARCHAR(120),
-    usuario_siga VARCHAR(120),
-    senha_siga VARCHAR(120),
-    ultima_atualizacao DATE DEFAULT CURRENT_DATE,
-    ativo SMALLINT DEFAULT 1,
-    PRIMARY KEY (aluno_id)
+CREATE TABLE ALUNO (
+    alu_id INT NOT NULL DEFAULT NEXTVAL ('alu_seq'),
+    alu_telegram_code VARCHAR(120) UNIQUE NOT NULL,
+    alu_nome VARCHAR(120),
+    alu_usuario_siga VARCHAR(120),
+    alu_senha_siga VARCHAR(120),
+    alu_ultima_atualizacao DATE DEFAULT CURRENT_DATE,
+    alu_ativo SMALLINT DEFAULT 1,
+
+    PRIMARY KEY (alu_id)
 );
 
-CREATE SEQUENCE materia_seq;
+CREATE SEQUENCE mat_seq;
 
-CREATE TABLE materia (
-	materia_id INT NOT NULL DEFAULT NEXTVAL ('materia_seq'),
-	nome VARCHAR(120),
-    PRIMARY KEY (materia_id)
+CREATE TABLE MATERIA (
+    mat_id INT NOT NULL DEFAULT NEXTVAL ('mat_seq'),
+    mat_nome VARCHAR(120),
+
+    PRIMARY KEY (mat_id)
 );
 
-CREATE SEQUENCE aula_seq;
+CREATE SEQUENCE aul_seq;
 
-CREATE TABLE aula (
-    aula_id INT NOT NULL DEFAULT NEXTVAL ('aula_seq'),
-    materia_id INT NOT NULL,
-    dia_semana INT NOT NULL,
-    quantidade INT NOT NULL,
-    FOREIGN KEY (materia_id) REFERENCES materia (materia_id),
-    PRIMARY KEY (aula_id, materia_id)
+CREATE TABLE AULA (
+    aul_id INT NOT NULL DEFAULT NEXTVAL ('aul_seq'),
+    mat_id INT NOT NULL,
+    aul_dia_semana INT NOT NULL,
+    aul_quantidade INT NOT NULL,
+
+    FOREIGN KEY (mat_id) REFERENCES materia (mat_id),
+    PRIMARY KEY (aul_id, mat_id)
 );
 
-CREATE SEQUENCE matricula_seq;
+CREATE SEQUENCE matri_seq;
 
-CREATE TABLE matricula (
-    matricula_id INT NOT NULL DEFAULT NEXTVAL ('matricula_seq'),
-    aluno_id INT NOT NULL,
-    materia_id INT NOT NULL,
-    FOREIGN KEY (aluno_id) REFERENCES aluno (aluno_id),
-    FOREIGN KEY (materia_id) REFERENCES materia (materia_id),
-    PRIMARY KEY (matricula_id)
+CREATE TABLE MATRICULA (
+    matri_id INT NOT NULL DEFAULT NEXTVAL ('matri_seq'),
+    alu_id INT NOT NULL,
+    mat_id INT NOT NULL,
+
+    FOREIGN KEY (alu_id) REFERENCES aluno (alu_id),
+    FOREIGN KEY (mat_id) REFERENCES materia (mat_id),
+    PRIMARY KEY (matri_id)
 );
 
-CREATE SEQUENCE falta_seq;
+CREATE SEQUENCE fal_seq;
 
-CREATE TABLE falta (
-    falta_id INT NOT NULL DEFAULT NEXTVAL ('falta_seq'),
-    matricula_id INT NOT NULL,
-    data_falta DATE NOT NULL,
-    quantidade INT NOT NULL, 
-    FOREIGN KEY (matricula_id) REFERENCES matricula (matricula_id),
-    PRIMARY KEY (falta_id, matricula_id)
+CREATE TABLE FALTA (
+    fal_id INT NOT NULL DEFAULT NEXTVAL ('fal_seq'),
+    matri_id INT NOT NULL,
+    fal_data DATE NOT NULL,    
+    fal_quantidade INT NOT NULL,
+
+    FOREIGN KEY (matri_id) REFERENCES matricula (matri_id),
+    PRIMARY KEY (fal_id, matri_id)
 ); 
 
-CREATE SEQUENCE nota_seq;
+CREATE SEQUENCE not_seq;
 
-CREATE TABLE nota (
-    nota_id INT NOT NULL DEFAULT NEXTVAL ('nota_seq'),
-    matricula_id INT NOT NULL,
-    nota FLOAT NOT NULL, 
-    FOREIGN KEY (matricula_id) REFERENCES matricula (matricula_id),
-    PRIMARY KEY (nota_id, matricula_id)
+CREATE TABLE NOTA (
+    not_id INT NOT NULL DEFAULT NEXTVAL ('not_seq'),
+    matri_id INT NOT NULL,
+    not_valor FLOAT NOT NULL,
+
+    FOREIGN KEY (matri_id) REFERENCES matricula (matri_id),
+    PRIMARY KEY (not_id, matri_id)
 );
+
+COMMIT;
